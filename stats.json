@@ -1,26 +1,12 @@
 {
   "wins": 271,
   "losses": 155,
-  "pending": 21,
+  "pending": 23,
   "total": 426,
   "accuracy": "63.6",
   "streak": "3W",
   "last_10": "6W-4L",
   "recent_calls": [
-    {
-      "call_number": 444,
-      "market": "Manchester United FC vs. Brentford FC: O/U 2.5",
-      "side": "Over",
-      "outcome": "win",
-      "verdict": "STRONG Over"
-    },
-    {
-      "call_number": 445,
-      "market": "St. Louis Cardinals vs. Pittsburgh Pirates",
-      "side": "Pittsburgh Pirates",
-      "outcome": "loss",
-      "verdict": "STRONG Pittsburgh Pirates"
-    },
     {
       "call_number": 446,
       "market": "Seattle Mariners vs. Minnesota Twins",
@@ -76,7 +62,21 @@
       "side": "Lorenzo Musetti",
       "outcome": "pending",
       "verdict": "STRONG Lorenzo Musetti"
+    },
+    {
+      "call_number": 454,
+      "market": "LoL: Weibo Gaming vs Top Esports (BO3) - LPL Group Ascend",
+      "side": "Top Esports",
+      "outcome": "pending",
+      "verdict": "STRONG Top Esports"
+    },
+    {
+      "call_number": 455,
+      "market": "Game Handicap: TES (-1.5) vs Weibo Gaming (+1.5)",
+      "side": "Weibo Gaming",
+      "outcome": "pending",
+      "verdict": "STRONG Weibo Gaming"
     }
   ],
-  "updated_at": "2026-04-28T10:30:01.555Z"
+  "updated_at": "2026-04-28T11:00:02.255Z"
 }
