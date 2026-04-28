@@ -1,9 +1,9 @@
 {
   "wins": 273,
-  "losses": 156,
-  "pending": 21,
-  "total": 429,
-  "accuracy": "63.6",
+  "losses": 157,
+  "pending": 20,
+  "total": 430,
+  "accuracy": "63.5",
   "streak": "1W",
   "last_10": "6W-4L",
   "recent_calls": [
@@ -60,7 +60,7 @@
       "call_number": 454,
       "market": "LoL: Weibo Gaming vs Top Esports (BO3) - LPL Group Ascend",
       "side": "Top Esports",
-      "outcome": "pending",
+      "outcome": "loss",
       "verdict": "STRONG Top Esports"
     },
     {
@@ -78,5 +78,5 @@
       "verdict": "STRONG FADE — Buy Casper Ruud"
     }
   ],
-  "updated_at": "2026-04-28T13:00:02.449Z"
+  "updated_at": "2026-04-28T13:30:01.795Z"
 }
