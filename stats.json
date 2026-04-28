@@ -1,9 +1,9 @@
 {
-  "wins": 266,
+  "wins": 267,
   "losses": 154,
-  "pending": 26,
-  "total": 420,
-  "accuracy": "63.3",
+  "pending": 25,
+  "total": 421,
+  "accuracy": "63.4",
   "streak": "1W",
   "last_10": "7W-3L",
   "recent_calls": [
@@ -78,5 +78,5 @@
       "verdict": "LEAN Over"
     }
   ],
-  "updated_at": "2026-04-28T03:00:02.570Z"
+  "updated_at": "2026-04-28T03:30:02.179Z"
 }
