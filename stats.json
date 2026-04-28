@@ -1,19 +1,12 @@
 {
   "wins": 276,
   "losses": 157,
-  "pending": 18,
+  "pending": 19,
   "total": 433,
   "accuracy": "63.7",
   "streak": "2W",
   "last_10": "7W-3L",
   "recent_calls": [
-    {
-      "call_number": 448,
-      "market": "Pistons vs. Magic: O/U 214.5",
-      "side": "Under",
-      "outcome": "win",
-      "verdict": "STRONG Under"
-    },
     {
       "call_number": 449,
       "market": "Spread: Thunder (-10.5)",
@@ -76,7 +69,14 @@
       "side": "Rajasthan Royals",
       "outcome": "pending",
       "verdict": "FADE — Buy Rajasthan Royals"
+    },
+    {
+      "call_number": 458,
+      "market": "Madrid Open: Francisco Cerundolo vs Alexander Blockx",
+      "side": "Francisco Cerundolo",
+      "outcome": "pending",
+      "verdict": "STRONG Francisco Cerundolo"
     }
   ],
-  "updated_at": "2026-04-28T16:30:01.465Z"
+  "updated_at": "2026-04-28T17:00:02.260Z"
 }
