@@ -1,10 +1,10 @@
 {
-  "wins": 269,
+  "wins": 270,
   "losses": 155,
-  "pending": 22,
-  "total": 424,
-  "accuracy": "63.4",
-  "streak": "2W",
+  "pending": 21,
+  "total": 425,
+  "accuracy": "63.5",
+  "streak": "3W",
   "last_10": "6W-4L",
   "recent_calls": [
     {
@@ -74,9 +74,9 @@
       "call_number": 452,
       "market": "Timberwolves vs. Nuggets: O/U 224.5",
       "side": "Over",
-      "outcome": "pending",
+      "outcome": "win",
       "verdict": "LEAN Over"
     }
   ],
-  "updated_at": "2026-04-28T05:00:01.447Z"
+  "updated_at": "2026-04-28T05:30:02.312Z"
 }
