@@ -1,8 +1,82 @@
 {
-  "wins": 229,
-  "total": 359,
-  "accuracy": "63.8",
-  "streak": "4W",
-  "today": "12/18",
-  "updated_at": "2026-04-27T00:00:00Z"
+  "wins": 265,
+  "losses": 153,
+  "pending": 27,
+  "total": 418,
+  "accuracy": "63.4",
+  "streak": "1L",
+  "last_10": "8W-2L",
+  "recent_calls": [
+    {
+      "call_number": 442,
+      "market": "Will Manchester United FC win on 2026-04-27?",
+      "side": "Yes",
+      "outcome": "win",
+      "verdict": "STRONG FADE — Buy Yes"
+    },
+    {
+      "call_number": 443,
+      "market": "Will RCD Espanyol de Barcelona win on 2026-04-27?",
+      "side": "Yes",
+      "outcome": "loss",
+      "verdict": "STRONG FADE — Buy Yes"
+    },
+    {
+      "call_number": 444,
+      "market": "Manchester United FC vs. Brentford FC: O/U 2.5",
+      "side": "Over",
+      "outcome": "win",
+      "verdict": "STRONG Over"
+    },
+    {
+      "call_number": 445,
+      "market": "St. Louis Cardinals vs. Pittsburgh Pirates",
+      "side": "Pittsburgh Pirates",
+      "outcome": "loss",
+      "verdict": "STRONG Pittsburgh Pirates"
+    },
+    {
+      "call_number": 446,
+      "market": "Seattle Mariners vs. Minnesota Twins",
+      "side": "Seattle Mariners",
+      "outcome": "pending",
+      "verdict": "STRONG Seattle Mariners"
+    },
+    {
+      "call_number": 447,
+      "market": "Los Angeles Angels vs. Chicago White Sox",
+      "side": "Chicago White Sox",
+      "outcome": "pending",
+      "verdict": "STRONG Chicago White Sox"
+    },
+    {
+      "call_number": 448,
+      "market": "Pistons vs. Magic: O/U 214.5",
+      "side": "Under",
+      "outcome": "pending",
+      "verdict": "STRONG Under"
+    },
+    {
+      "call_number": 449,
+      "market": "Spread: Thunder (-10.5)",
+      "side": "Thunder",
+      "outcome": "pending",
+      "verdict": "LEAN Thunder"
+    },
+    {
+      "call_number": 450,
+      "market": "Spread: Golden Knights (-1.5)",
+      "side": "Utah",
+      "outcome": "pending",
+      "verdict": "STRONG Utah"
+    },
+    {
+      "call_number": 451,
+      "market": "Chicago Cubs vs. San Diego Padres",
+      "side": "San Diego Padres",
+      "outcome": "pending",
+      "verdict": "LEAN San Diego Padres"
+    }
+  ],
+  "updated_at": "2026-04-28T01:35:46.089Z"
 }
