@@ -1,10 +1,10 @@
 {
-  "wins": 267,
+  "wins": 269,
   "losses": 155,
-  "pending": 24,
-  "total": 422,
-  "accuracy": "63.3",
-  "streak": "1L",
+  "pending": 22,
+  "total": 424,
+  "accuracy": "63.4",
+  "streak": "2W",
   "last_10": "6W-4L",
   "recent_calls": [
     {
@@ -60,14 +60,14 @@
       "call_number": 450,
       "market": "Spread: Golden Knights (-1.5)",
       "side": "Utah",
-      "outcome": "pending",
+      "outcome": "win",
       "verdict": "STRONG Utah"
     },
     {
       "call_number": 451,
       "market": "Chicago Cubs vs. San Diego Padres",
       "side": "San Diego Padres",
-      "outcome": "pending",
+      "outcome": "win",
       "verdict": "LEAN San Diego Padres"
     },
     {
@@ -78,5 +78,5 @@
       "verdict": "LEAN Over"
     }
   ],
-  "updated_at": "2026-04-28T04:30:02.387Z"
+  "updated_at": "2026-04-28T05:00:01.447Z"
 }
