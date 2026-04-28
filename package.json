@@ -1,0 +1,9 @@
+{
+  "name": "polybaby-landing",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}
