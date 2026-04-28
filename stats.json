@@ -1,19 +1,12 @@
 {
   "wins": 271,
   "losses": 155,
-  "pending": 20,
+  "pending": 21,
   "total": 426,
   "accuracy": "63.6",
   "streak": "3W",
   "last_10": "6W-4L",
   "recent_calls": [
-    {
-      "call_number": 443,
-      "market": "Will RCD Espanyol de Barcelona win on 2026-04-27?",
-      "side": "Yes",
-      "outcome": "loss",
-      "verdict": "STRONG FADE — Buy Yes"
-    },
     {
       "call_number": 444,
       "market": "Manchester United FC vs. Brentford FC: O/U 2.5",
@@ -76,7 +69,14 @@
       "side": "Over",
       "outcome": "win",
       "verdict": "LEAN Over"
+    },
+    {
+      "call_number": 453,
+      "market": "Madrid Open: Jiri Lehecka vs Lorenzo Musetti",
+      "side": "Lorenzo Musetti",
+      "outcome": "pending",
+      "verdict": "STRONG Lorenzo Musetti"
     }
   ],
-  "updated_at": "2026-04-28T10:00:02.222Z"
+  "updated_at": "2026-04-28T10:30:01.555Z"
 }
