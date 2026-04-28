@@ -1,19 +1,12 @@
 {
   "wins": 271,
   "losses": 155,
-  "pending": 23,
+  "pending": 24,
   "total": 426,
   "accuracy": "63.6",
   "streak": "3W",
   "last_10": "6W-4L",
   "recent_calls": [
-    {
-      "call_number": 446,
-      "market": "Seattle Mariners vs. Minnesota Twins",
-      "side": "Seattle Mariners",
-      "outcome": "loss",
-      "verdict": "STRONG Seattle Mariners"
-    },
     {
       "call_number": 447,
       "market": "Los Angeles Angels vs. Chicago White Sox",
@@ -76,7 +69,14 @@
       "side": "Weibo Gaming",
       "outcome": "pending",
       "verdict": "STRONG Weibo Gaming"
+    },
+    {
+      "call_number": 456,
+      "market": "Madrid Open: Stefanos Tsitsipas vs Casper Ruud",
+      "side": "Casper Ruud",
+      "outcome": "pending",
+      "verdict": "STRONG FADE — Buy Casper Ruud"
     }
   ],
-  "updated_at": "2026-04-28T12:00:01.530Z"
+  "updated_at": "2026-04-28T12:30:01.536Z"
 }
