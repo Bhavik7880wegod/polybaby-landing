@@ -1,9 +1,9 @@
 {
-  "wins": 270,
+  "wins": 271,
   "losses": 155,
-  "pending": 21,
-  "total": 425,
-  "accuracy": "63.5",
+  "pending": 20,
+  "total": 426,
+  "accuracy": "63.6",
   "streak": "3W",
   "last_10": "6W-4L",
   "recent_calls": [
@@ -39,7 +39,7 @@
       "call_number": 447,
       "market": "Los Angeles Angels vs. Chicago White Sox",
       "side": "Chicago White Sox",
-      "outcome": "pending",
+      "outcome": "win",
       "verdict": "STRONG Chicago White Sox"
     },
     {
@@ -78,5 +78,5 @@
       "verdict": "LEAN Over"
     }
   ],
-  "updated_at": "2026-04-28T05:30:02.312Z"
+  "updated_at": "2026-04-28T06:00:01.475Z"
 }
