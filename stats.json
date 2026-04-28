@@ -1,19 +1,12 @@
 {
-  "wins": 273,
+  "wins": 274,
   "losses": 157,
   "pending": 20,
-  "total": 430,
-  "accuracy": "63.5",
+  "total": 431,
+  "accuracy": "63.6",
   "streak": "1W",
   "last_10": "6W-4L",
   "recent_calls": [
-    {
-      "call_number": 447,
-      "market": "Los Angeles Angels vs. Chicago White Sox",
-      "side": "Chicago White Sox",
-      "outcome": "win",
-      "verdict": "STRONG Chicago White Sox"
-    },
     {
       "call_number": 448,
       "market": "Pistons vs. Magic: O/U 214.5",
@@ -76,7 +69,14 @@
       "side": "Casper Ruud",
       "outcome": "pending",
       "verdict": "STRONG FADE — Buy Casper Ruud"
+    },
+    {
+      "call_number": 457,
+      "market": "Indian Premier League: Punjab Kings vs Rajasthan Royals",
+      "side": "Rajasthan Royals",
+      "outcome": "pending",
+      "verdict": "FADE — Buy Rajasthan Royals"
     }
   ],
-  "updated_at": "2026-04-28T13:30:01.795Z"
+  "updated_at": "2026-04-28T14:00:02.101Z"
 }
