@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PolyBaby — Track Who's Already Betting</title>
-<meta name="description" content="Polymarket whale tracker. Real-time alerts, 30-min pre-game sports picks, smart money divergence detection. 229 wins, 359 calls, 63.8% verifiable in Discord.">
+<meta name="description" content="Polymarket whale tracker. Real-time alerts, 30-min pre-game sports picks, smart money divergence detection. 276 wins, 433 calls, 63.7% verifiable in Discord.">
 <meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -125,7 +125,7 @@
   <div class="top">
     <div class="brand">POLYBABY</div>
     <div class="status-center">POLYMARKET WHALE TRACKER</div>
-    <div class="live"><span class="live-dot"></span>229 / 359 · 63.8%</div>
+    <div class="live"><span class="live-dot"></span>276 / 433 · 63.7%</div>
   </div>
 
   <div class="center">
@@ -218,8 +218,8 @@
     setInterval(tick, 1000);
   })();
 
-  // Live stats fetch — falls back to hardcoded if stats.json missing
-  fetch('/stats.json', {cache: 'no-store'})
+  // Live stats from Neon via /api/stats — falls back to hardcoded text if API fails
+  fetch('/api/stats', {cache: 'no-store'})
     .then(r => r.ok ? r.json() : null)
     .then(s => {
       if (!s) return;
