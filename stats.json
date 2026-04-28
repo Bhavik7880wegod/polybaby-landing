@@ -1,10 +1,10 @@
 {
-  "wins": 271,
-  "losses": 155,
-  "pending": 24,
-  "total": 426,
+  "wins": 273,
+  "losses": 156,
+  "pending": 21,
+  "total": 429,
   "accuracy": "63.6",
-  "streak": "3W",
+  "streak": "1W",
   "last_10": "6W-4L",
   "recent_calls": [
     {
@@ -53,7 +53,7 @@
       "call_number": 453,
       "market": "Madrid Open: Jiri Lehecka vs Lorenzo Musetti",
       "side": "Lorenzo Musetti",
-      "outcome": "pending",
+      "outcome": "loss",
       "verdict": "STRONG Lorenzo Musetti"
     },
     {
@@ -67,7 +67,7 @@
       "call_number": 455,
       "market": "Game Handicap: TES (-1.5) vs Weibo Gaming (+1.5)",
       "side": "Weibo Gaming",
-      "outcome": "pending",
+      "outcome": "win",
       "verdict": "STRONG Weibo Gaming"
     },
     {
@@ -78,5 +78,5 @@
       "verdict": "STRONG FADE — Buy Casper Ruud"
     }
   ],
-  "updated_at": "2026-04-28T12:30:01.536Z"
+  "updated_at": "2026-04-28T13:00:02.449Z"
 }
