@@ -1,11 +1,11 @@
 {
   "wins": 267,
-  "losses": 154,
-  "pending": 25,
-  "total": 421,
-  "accuracy": "63.4",
-  "streak": "1W",
-  "last_10": "7W-3L",
+  "losses": 155,
+  "pending": 24,
+  "total": 422,
+  "accuracy": "63.3",
+  "streak": "1L",
+  "last_10": "6W-4L",
   "recent_calls": [
     {
       "call_number": 443,
@@ -53,7 +53,7 @@
       "call_number": 449,
       "market": "Spread: Thunder (-10.5)",
       "side": "Thunder",
-      "outcome": "pending",
+      "outcome": "loss",
       "verdict": "LEAN Thunder"
     },
     {
@@ -78,5 +78,5 @@
       "verdict": "LEAN Over"
     }
   ],
-  "updated_at": "2026-04-28T04:00:02.724Z"
+  "updated_at": "2026-04-28T04:30:02.387Z"
 }
