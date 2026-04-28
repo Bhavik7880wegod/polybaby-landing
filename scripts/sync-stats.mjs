@@ -5,7 +5,16 @@ import os from 'node:os';
 
 const BRAIN_ROOT = process.env.BRAIN_ROOT ?? path.join(os.homedir(), 'polybaby-brain', 'Polymarket');
 const CALLS_DIR = path.join(BRAIN_ROOT, 'calls');
+const COUNTER_PATH = path.join(CALLS_DIR, 'call-counter.json');
 const OUT = process.env.STATS_OUT ?? path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', 'stats.json');
+
+function normalizeOutcome(v) {
+  if (typeof v !== 'string') return 'pending';
+  const lower = v.toLowerCase();
+  if (lower === 'win' || lower === 'won') return 'win';
+  if (lower === 'loss' || lower === 'lost' || lower === 'lose') return 'loss';
+  return 'pending';
+}
 
 function parseFrontmatter(md) {
   const m = md.match(/^---\n([\s\S]*?)\n---/);
@@ -26,20 +35,27 @@ function parseFrontmatter(md) {
   return obj;
 }
 
+// call-counter.json is the source of truth for totals (older .md files get pruned)
+const counter = JSON.parse(fs.readFileSync(COUNTER_PATH, 'utf8'));
+const wins = counter.wins ?? 0;
+const losses = counter.losses ?? 0;
+const pending = counter.pending ?? 0;
+const total = wins + losses;
+const accuracy = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
+
+// Walk surviving .md files for derived detail (streak, last_10, recent_calls)
 const files = fs.readdirSync(CALLS_DIR).filter(f => /^call-\d+\.md$/.test(f));
 const calls = [];
 for (const f of files) {
   const fm = parseFrontmatter(fs.readFileSync(path.join(CALLS_DIR, f), 'utf8'));
-  if (fm && fm.call_number != null) calls.push(fm);
+  if (fm && fm.call_number != null) {
+    fm.outcome = normalizeOutcome(fm.outcome);
+    calls.push(fm);
+  }
 }
 calls.sort((a, b) => a.call_number - b.call_number);
 
 const resolved = calls.filter(c => c.outcome === 'win' || c.outcome === 'loss');
-const wins = resolved.filter(c => c.outcome === 'win').length;
-const losses = resolved.filter(c => c.outcome === 'loss').length;
-const pending = calls.filter(c => c.outcome === 'pending').length;
-const total = wins + losses;
-const accuracy = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
 
 const recentResolved = resolved.slice(-10);
 const last10Wins = recentResolved.filter(c => c.outcome === 'win').length;
