@@ -1,11 +1,11 @@
 {
-  "wins": 274,
+  "wins": 275,
   "losses": 157,
-  "pending": 20,
-  "total": 431,
-  "accuracy": "63.6",
-  "streak": "1W",
-  "last_10": "6W-4L",
+  "pending": 19,
+  "total": 432,
+  "accuracy": "63.7",
+  "streak": "2W",
+  "last_10": "7W-3L",
   "recent_calls": [
     {
       "call_number": 448,
@@ -67,7 +67,7 @@
       "call_number": 456,
       "market": "Madrid Open: Stefanos Tsitsipas vs Casper Ruud",
       "side": "Casper Ruud",
-      "outcome": "pending",
+      "outcome": "win",
       "verdict": "STRONG FADE — Buy Casper Ruud"
     },
     {
@@ -78,5 +78,5 @@
       "verdict": "FADE — Buy Rajasthan Royals"
     }
   ],
-  "updated_at": "2026-04-28T15:30:03.009Z"
+  "updated_at": "2026-04-28T16:00:03.007Z"
 }
