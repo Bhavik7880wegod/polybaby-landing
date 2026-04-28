@@ -1,10 +1,10 @@
 {
-  "wins": 265,
+  "wins": 266,
   "losses": 154,
-  "pending": 27,
-  "total": 419,
-  "accuracy": "63.2",
-  "streak": "2L",
+  "pending": 26,
+  "total": 420,
+  "accuracy": "63.3",
+  "streak": "1W",
   "last_10": "7W-3L",
   "recent_calls": [
     {
@@ -46,7 +46,7 @@
       "call_number": 448,
       "market": "Pistons vs. Magic: O/U 214.5",
       "side": "Under",
-      "outcome": "pending",
+      "outcome": "win",
       "verdict": "STRONG Under"
     },
     {
@@ -78,5 +78,5 @@
       "verdict": "LEAN Over"
     }
   ],
-  "updated_at": "2026-04-28T02:30:02.180Z"
+  "updated_at": "2026-04-28T03:00:02.570Z"
 }
