@@ -1,8 +1,8 @@
 {
-  "wins": 275,
+  "wins": 276,
   "losses": 157,
-  "pending": 19,
-  "total": 432,
+  "pending": 18,
+  "total": 433,
   "accuracy": "63.7",
   "streak": "2W",
   "last_10": "7W-3L",
@@ -78,5 +78,5 @@
       "verdict": "FADE — Buy Rajasthan Royals"
     }
   ],
-  "updated_at": "2026-04-28T16:00:03.007Z"
+  "updated_at": "2026-04-28T16:30:01.465Z"
 }
