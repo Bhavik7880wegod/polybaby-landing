@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PolyBaby — Polymarket alerts. Track who's already betting.</title>
-<meta name="description" content="Real-time Polymarket whale alerts, 30-min pre-game sports picks, smart-money divergence. 276 wins, 433 calls, 63.7% verifiable. Join the Discord.">
+<title>PolyBaby — Polymarket Tracker, Whale Alerts & Smart-Money Signals</title>
+<meta name="description" content="Polymarket tracker built by traders. Real-time whale alerts, top-trader follow signals, smart-money divergence detection across NBA, NFL, soccer, esports. 63% verified accuracy across 487 calls. Free Discord access.">
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/jpeg" href="/favicon.jpg">
 <link rel="shortcut icon" type="image/jpeg" href="/favicon.jpg">
@@ -12,8 +12,8 @@
 <link rel="canonical" href="https://polybabyalerts.com/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://polybabyalerts.com/">
-<meta property="og:title" content="PolyBaby — Polymarket alerts. Track who's already betting.">
-<meta property="og:description" content="Real-time Polymarket whale alerts, 30-min pre-game sports picks, smart-money divergence. 276 wins, 433 calls, 63.7% verifiable.">
+<meta property="og:title" content="PolyBaby — Polymarket Tracker, Whale Alerts & Smart-Money Signals">
+<meta property="og:description" content="Polymarket tracker for traders. Real-time whale alerts, top-trader follow signals, smart-money divergence across NBA, NFL, soccer, esports. 63% verified accuracy across 487 calls.">
 <meta property="og:site_name" content="PolyBaby">
 <meta property="og:image" content="https://polybabyalerts.com/api/og">
 <meta property="og:image:width" content="1200">
@@ -21,10 +21,10 @@
 <meta property="og:image:alt" content="PolyBaby — Polymarket alerts dashboard">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://polybabyalerts.com/">
-<meta name="twitter:title" content="PolyBaby — Polymarket alerts. Track who's already betting.">
-<meta name="twitter:description" content="Real-time Polymarket whale alerts, 30-min pre-game sports picks, smart-money divergence. 276 wins, 433 calls, 63.7% verifiable.">
+<meta name="twitter:title" content="PolyBaby — Polymarket Tracker, Whale Alerts & Smart-Money Signals">
+<meta name="twitter:description" content="Polymarket tracker for traders. Whale alerts, top-trader follow signals, smart-money divergence. 63% accuracy across 487 calls.">
 <meta name="twitter:image" content="https://polybabyalerts.com/api/og">
-<meta name="keywords" content="polymarket alerts, polymarket signals, polymarket whale tracker, polymarket bot, smart money tracker, prediction market signals, sports betting signals, polymarket discord">
+<meta name="keywords" content="polymarket tracker, polymarket trader, polymarket whale tracker, polymarket alerts, polymarket signals, polymarket smart money, polymarket trader follow, polymarket bot, polymarket discord, polymarket whale alerts, prediction market tracker, top polymarket traders, polymarket NBA tracker, polymarket NFL tracker, polymarket esports tracker, smart money signals, sports betting signals">
 <meta name="author" content="PolyBaby">
 <meta name="robots" content="index, follow">
 <script type="application/ld+json">
@@ -55,12 +55,57 @@
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "url": "https://polybabyalerts.com/",
-      "description": "Polymarket signal generator. Tracks top Polymarket wallets and surfaces high-conviction calls in real time via Discord.",
+      "description": "Polymarket tracker that follows top traders and surfaces high-conviction calls in real time via Discord.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a Polymarket tracker?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A Polymarket tracker monitors trades across Polymarket's prediction markets in real time and surfaces large positions, top-trader activity, and smart-money divergence so retail traders can follow informed flow. PolyBaby is a free Polymarket tracker focused on sports markets — NBA, NFL, NHL, MLB, soccer, esports, cricket, tennis, golf, F1 — with verified track-record stats."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I follow top Polymarket traders?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PolyBaby tracks the top 50 Polymarket traders by lifetime PnL and posts an alert in Discord whenever one of them takes a position. Traders can join free at discord.gg/wFR38QJq to get real-time pings, smart-money divergence signals, and 30-minute pre-game sports picks across all major leagues."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is smart-money divergence on Polymarket?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Smart-money divergence is the gap between Polymarket's overall market price (the public consensus) and the side that the top traders and whales are stacking. PolyBaby calculates this divergence in real time and only fires a signal when divergence exceeds 15%, indicating informed traders disagree with the public."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is PolyBaby's track record verifiable?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Every PolyBaby call is logged with the exact Polymarket market URL, entry price, side, and timestamp before the event resolves. The cumulative track record (currently 294 wins, 173 losses, 63% accuracy across 487 calls) is shown live on polybabyalerts.com and is independently verifiable on Polymarket itself."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does PolyBaby support NBA, NFL, soccer, and esports?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. PolyBaby covers all sports markets on Polymarket: NBA, NFL, NHL, MLB, Premier League, La Liga, Champions League, ATP/WTA tennis, PGA golf, F1, UFC, IPL cricket, and esports (League of Legends, Counter-Strike, Valorant, Dota 2). Each league has its own breakdown on the public dashboard with win rates and call counts."
+          }
+        }
+      ]
     }
   ]
 }
@@ -274,6 +319,22 @@
      taller recent-calls column instead of floating at the top. */
   #dashboard .d-grid > .panel:first-child{align-self:center}
   @media (max-width:1100px){#dashboard .d-grid{grid-template-columns:1fr}}
+  /* ═══ SEO content section — visible to readers and crawlers, brand-styled ═══ */
+  .seo-section{
+    max-width:920px;margin:0 auto;padding:80px 24px 40px;
+    color:rgba(255,255,255,0.7);font-size:14.5px;line-height:1.7;
+  }
+  .seo-section h2{
+    font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px;
+    text-transform:uppercase;margin-bottom:12px;margin-top:36px;
+  }
+  .seo-section h2:first-of-type{margin-top:0}
+  .seo-section p{margin-bottom:14px}
+  .seo-section strong{color:#fff;font-weight:600}
+  .seo-section ul{margin:8px 0 14px 20px}
+  .seo-section li{margin-bottom:6px}
+  .seo-section a{color:#EC4899;text-decoration:none}
+  .seo-section a:hover{text-decoration:underline}
 
   #dashboard .panel{
     background:var(--d-surface);border:1px solid var(--d-border);
@@ -550,6 +611,49 @@
   </div>
 </section>
 <!-- ═══════════ /Dashboard section ═══════════ -->
+
+<!-- ═══════════ SEO content (also useful for first-time visitors) ═══════════ -->
+<section class="seo-section" aria-label="About PolyBaby">
+  <h2>The Polymarket tracker built by traders</h2>
+  <p>
+    PolyBaby is a real-time <strong>Polymarket tracker</strong> that follows the top 50 traders
+    on the platform and surfaces high-conviction calls in Discord 30 minutes before sports
+    events tip off. Every signal is sourced from on-chain Polymarket activity — whale positions,
+    fresh-wallet sweeps, top-trader follows, smart-money divergence — and posted to a public
+    Discord with a verifiable track record.
+  </p>
+  <p>
+    If you're searching for a <strong>Polymarket whale tracker</strong>, a way to
+    <strong>follow top Polymarket traders</strong>, or a feed that catches when
+    <strong>smart money diverges from the public</strong>, this is what PolyBaby does — across
+    every active sports market on Polymarket, in real time.
+  </p>
+
+  <h2>What PolyBaby tracks</h2>
+  <ul>
+    <li><strong>Top-trader alerts</strong> — fires whenever a top-50 Polymarket trader (by lifetime PnL) takes a fresh position</li>
+    <li><strong>Whale alerts</strong> — fires on positions over $10K from any wallet</li>
+    <li><strong>Fresh-wallet swarms</strong> — multiple new wallets stacking the same side within minutes (often the earliest insider tell)</li>
+    <li><strong>Smart-money divergence</strong> — gap between public market price and what informed wallets are buying, only fires above 15%</li>
+    <li><strong>Pre-game sports picks</strong> — 30-minute pre-tipoff signals across NBA, NFL, NHL, MLB, soccer (Premier League, La Liga, Champions League), tennis, golf, F1, UFC, esports, IPL cricket</li>
+  </ul>
+
+  <h2>Verifiable track record</h2>
+  <p>
+    Every PolyBaby call is logged with the exact Polymarket URL, entry price, side, and timestamp
+    before the event resolves. The cumulative track record is shown live in the dashboard above:
+    <strong>294 wins / 173 losses / 63% accuracy across 487 calls</strong>. Every win is independently
+    verifiable on Polymarket itself — no deletion, no curated highlight reels.
+  </p>
+
+  <h2>How to start</h2>
+  <p>
+    Free Discord: <a href="https://discord.gg/wFR38QJq">discord.gg/wFR38QJq</a>. You'll
+    get every signal the moment it fires. Coming soon: a paid <strong>Polymarket Insider</strong>
+    tier with stake-sized signals, politics-only feeds at 1.20+ odds, and per-league
+    backtest dashboards. Countdown above.
+  </p>
+</section>
 
 <div class="footer-strip footer-bottom">
   <div>© 2026 PolyBaby · Not affiliated with Polymarket · For entertainment only</div>
