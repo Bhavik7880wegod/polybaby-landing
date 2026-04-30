@@ -687,7 +687,8 @@
 
     const catEl = $('d-categories');
     if (catEl && Array.isArray(data.categories) && data.categories.length) {
-      catEl.innerHTML = data.categories.map(cat => {
+      const hiddenCount = Number(data.categoriesHiddenCount || 0);
+      const rows = data.categories.map(cat => {
         const rateText = cat.winRate != null ? cat.winRate.toFixed(0) + '%' : '—';
         return '<div class="cat-row">' +
           '<span class="cat-label">' + esc(fmtTag(cat.label)) + '</span>' +
@@ -697,6 +698,16 @@
           '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
         '</div>';
       }).join('');
+      const tail = hiddenCount > 0
+        ? '<div class="cat-row cat-row-hidden">' +
+            '<span class="cat-label" style="opacity:0.55">Other</span>' +
+            '<span class="cat-bar"></span>' +
+            '<span class="cat-count">' + hiddenCount + ' ' + (hiddenCount === 1 ? 'call' : 'calls') + '</span>' +
+            '<span class="cat-rate" style="opacity:0.55">—</span>' +
+            '<span class="cat-dot" style="color:var(--d-muted)">·</span>' +
+          '</div>'
+        : '';
+      catEl.innerHTML = rows + tail;
     }
 
     const callsEl = $('d-calls');

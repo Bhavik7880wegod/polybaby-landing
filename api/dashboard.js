@@ -86,6 +86,14 @@ export default async function handler() {
       winRate: r.resolved > 0 ? Math.round((r.wins / r.resolved) * 1000) / 10 : null,
     }));
 
+    // Reconcile the categories panel against the headline counter so
+    // visitors don't see "215 visible vs 463 total" and assume broken math.
+    // Politics + Other + small/long-tail categories are deliberately hidden;
+    // surface the delta as a single muted "+ N other" row.
+    const totalCallsAcrossAll = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
+    const visibleCallsSum = categories.reduce((a, c) => a + c.calls, 0);
+    const categoriesHiddenCount = Math.max(0, totalCallsAcrossAll - visibleCallsSum);
+
     const recentCalls = recentRows.map(r => ({
       callNumber: r.call_number,
       sport: r.sport,
@@ -125,6 +133,7 @@ export default async function handler() {
         accuracy: counter.accuracy != null ? counter.accuracy.toFixed(1) : '0.0',
       },
       categories,
+      categoriesHiddenCount,
       recentCalls,
       pnlSeries,
       lastUpdated: counter.updated_at,
