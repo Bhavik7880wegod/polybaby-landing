@@ -689,16 +689,28 @@
     if (catEl && Array.isArray(data.categories) && data.categories.length) {
       const insider = data.insider || { labels: [], calls: 0, winRate: null };
       const insiderCount = Number(insider.calls || 0);
-      const rows = data.categories.map(cat => {
-        const rateText = cat.winRate != null ? cat.winRate.toFixed(0) + '%' : '—';
-        return '<div class="cat-row">' +
-          '<span class="cat-label">' + esc(fmtTag(cat.label)) + '</span>' +
-          '<span class="cat-bar"></span>' +
-          '<span class="cat-count">' + cat.calls + ' ' + (cat.calls === 1 ? 'call' : 'calls') + '</span>' +
-          '<span class="cat-rate">' + rateText + '</span>' +
-          '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
-        '</div>';
-      }).join('');
+      // Display rule for the rate column:
+      //   resolved >= 10  → show "X%" (statistically meaningful)
+      //   resolved 1-9    → show "W-L" record (small sample, raw is honest)
+      //   resolved == 0   → show "—" (all pending)
+      const rateForCat = (cat) => {
+        const resolved = Number(cat.resolved || 0);
+        if (resolved >= 10 && cat.winRate != null) return cat.winRate.toFixed(0) + '%';
+        if (resolved > 0) return (cat.wins || 0) + '-' + (cat.losses || 0);
+        return '—';
+      };
+      const rows = data.categories
+        .filter(cat => (cat.calls || 0) > 0)
+        .map(cat => {
+          const rateText = rateForCat(cat);
+          return '<div class="cat-row">' +
+            '<span class="cat-label">' + esc(fmtTag(cat.label)) + '</span>' +
+            '<span class="cat-bar"></span>' +
+            '<span class="cat-count">' + cat.calls + ' ' + (cat.calls === 1 ? 'call' : 'calls') + '</span>' +
+            '<span class="cat-rate">' + rateText + '</span>' +
+            '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
+          '</div>';
+        }).join('');
       const insiderRate = insider.winRate != null
         ? Number(insider.winRate).toFixed(0) + '%'
         : '—';

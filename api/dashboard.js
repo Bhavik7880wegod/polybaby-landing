@@ -28,23 +28,49 @@ export default async function handler() {
         FROM call_counter
         LIMIT 1
       `,
-      // Categories — exclude Insider categories so the visible top-12
-      // never includes Politics or Crypto (those join the Insider row).
+      // Categories — classify each call into a canonical league using
+      // sport (when set) or market_question text. The brain's deriveSport
+      // regex is narrow (only catches a few team names), so most NBA/NFL/
+      // NHL/MLB games where the question says "Bulls vs Heat" or "Bruins
+      // vs Sabres" fall into a generic Sports umbrella. We re-classify at
+      // read time using a wider keyword set so the public dashboard shows
+      // real per-league counts.
+      // Categories excluded here (Politics, Crypto) join the Insider row.
       sql`
+        WITH classified AS (
+          SELECT
+            CASE
+              WHEN COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES})
+                THEN COALESCE(sport, category)
+              WHEN sport IN ('NBA','NFL','NHL','Soccer','Esports','Cricket')
+                THEN sport
+              WHEN market_question ~* '(\\mnba\\M|lakers|celtics|warriors|bulls|knicks|heat|nets|76ers|sixers|bucks|suns|mavericks|\\mmavs\\M|nuggets|spurs|rockets|thunder|jazz|trail blazers|blazers|clippers|pelicans|hawks|hornets|magic|pistons|pacers|cavaliers|cavs|wizards|raptors|grizzlies|timberwolves|basketball)'
+                THEN 'NBA'
+              WHEN market_question ~* '(\\mnfl\\M|patriots|cowboys|eagles|chiefs|bills|49ers|niners|ravens|steelers|packers|vikings|bears|lions|dolphins|bengals|browns|broncos|raiders|chargers|texans|colts|jaguars|titans|buccaneers|saints|falcons|seahawks|rams|commanders|super bowl)'
+                THEN 'NFL'
+              WHEN market_question ~* '(\\mnhl\\M|hockey|penguins|bruins|maple leafs|canadiens|senators|sabres|devils|islanders|flyers|capitals|hurricanes|lightning|predators|stars|avalanche|\\mwild\\M|blackhawks|blues|coyotes|golden knights|kraken|oilers|canucks|flames|sharks|ducks|blue jackets|red wings|stanley cup)'
+                THEN 'NHL'
+              WHEN market_question ~* '(soccer|premier league|champions league|\\mucl\\M|\\muefa\\M|bundesliga|la liga|serie a|\\mmls\\M|\\mfifa\\M|world cup|liverpool|arsenal|chelsea|man city|man united|tottenham|\\mpsg\\M|bayern|real madrid|barcelona|juventus)'
+                THEN 'Soccer'
+              WHEN market_question ~* '(esports?|counter-?strike|\\mcs2\\M|valorant|league of legends|\\mdota\\M|\\miem\\M|\\mvct\\M)'
+                THEN 'Esports'
+              WHEN market_question ~* '(cricket|\\mipl\\M|\\mt20\\M|\\modi\\M)'
+                THEN 'Cricket'
+              ELSE 'Others'
+            END AS league,
+            outcome
+          FROM calls
+        )
         SELECT
-          COALESCE(sport, category) AS label,
+          league AS label,
           COUNT(*)::int AS calls,
           SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
           SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
-        FROM calls
-        WHERE COALESCE(sport, category) IS NOT NULL
-          AND COALESCE(sport, category) <> 'Other'
-          AND NOT (COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES}))
-        GROUP BY label
-        HAVING COUNT(*) >= 5
+        FROM classified
+        WHERE NOT (league = ANY(${INSIDER_CATEGORIES}))
+        GROUP BY league
         ORDER BY calls DESC
-        LIMIT 12
       `,
       // Recent calls — hide Insider categories from the public stream.
       sql`
@@ -98,18 +124,17 @@ export default async function handler() {
       );
     }
 
-    // Win-rate sample-size floor — never claim a rate on tiny denominators.
-    // Below this threshold, winRate stays null and the UI shows "—" so a
-    // category with a 7-0 record reads as "we don't have enough data yet"
-    // rather than a misleading 100%.
-    const RATE_MIN_RESOLVED = 10;
+    // Always compute winRate when there's at least one resolved call.
+    // The frontend decides display: "X%" for resolved >= 10, W-L record
+    // for smaller samples, "—" for zero resolved. Keeping the raw rate in
+    // the payload lets the dot-color and tooltip logic work consistently.
     const categories = categoryRows.map(r => ({
       label: r.label,
       calls: r.calls,
       wins: r.wins,
       losses: r.losses,
       resolved: r.resolved,
-      winRate: r.resolved >= RATE_MIN_RESOLVED
+      winRate: r.resolved > 0
         ? Math.round((r.wins / r.resolved) * 1000) / 10
         : null,
     }));
