@@ -47,7 +47,7 @@ export default async function handler() {
                 THEN sport
               WHEN market_question ~* '(\\mnba\\M|lakers|celtics|warriors|bulls|knicks|heat|nets|76ers|sixers|bucks|suns|mavericks|\\mmavs\\M|nuggets|spurs|rockets|thunder|jazz|trail blazers|blazers|clippers|pelicans|hawks|hornets|magic|pistons|pacers|cavaliers|cavs|wizards|raptors|grizzlies|timberwolves|basketball)'
                 THEN 'NBA'
-              WHEN market_question ~* '(\\mnfl\\M|patriots|cowboys|eagles|chiefs|bills|49ers|niners|ravens|steelers|packers|vikings|bears|lions|dolphins|bengals|browns|broncos|raiders|chargers|texans|colts|jaguars|titans|buccaneers|saints|falcons|seahawks|rams|commanders|super bowl|\\mafc\\M|\\mnfc\\M)'
+              WHEN market_question ~* '(\\mnfl\\M|patriots|cowboys|eagles|chiefs|bills|49ers|niners|ravens|steelers|packers|vikings|bears|\\mlions\\M|dolphins|bengals|browns|broncos|raiders|chargers|texans|colts|jaguars|titans|buccaneers|\\mbucs\\M|saints|falcons|seahawks|\\mrams\\M|commanders|washington commanders|super bowl|\\mafc\\M|\\mnfc\\M|nfl draft|jets vs|vs jets|giants vs|vs giants|panthers vs|vs panthers|cardinals vs|vs cardinals)'
                 THEN 'NFL'
               WHEN market_question ~* '(\\mnhl\\M|hockey|penguins|bruins|maple leafs|canadiens|senators|sabres|devils|islanders|flyers|capitals|hurricanes|lightning|predators|stars|avalanche|\\mwild\\M|blackhawks|\\mblues\\M|coyotes|golden knights|kraken|oilers|canucks|flames|sharks|ducks|blue jackets|red wings|stanley cup)'
                 THEN 'NHL'
@@ -67,7 +67,7 @@ export default async function handler() {
                 THEN 'Golf'
               WHEN market_question ~* '(\\mufc\\M|\\mmma\\M|boxing|jon jones|conor mcgregor|khabib|ngannou|usman|adesanya|fury|joshua|alvarez|canelo)'
                 THEN 'UFC'
-              ELSE 'Misc'
+              ELSE 'Mixed'
             END AS league,
             outcome
           FROM calls
@@ -80,7 +80,6 @@ export default async function handler() {
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
         FROM classified
         WHERE NOT (league = ANY(${INSIDER_CATEGORIES}))
-          AND league <> 'Misc'
         GROUP BY league
         ORDER BY calls DESC
       `,
