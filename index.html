@@ -336,64 +336,6 @@
     #dashboard .res-table .res-side{display:none}
   }
 
-  /* Smart Money Pool */
-  #dashboard .sm-section{max-width:1280px;margin:56px auto 0}
-  #dashboard .sm-stats{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;
-  }
-  @media (max-width:720px){#dashboard .sm-stats{grid-template-columns:1fr}}
-  #dashboard .sm-stat{
-    background:var(--d-surface);border:1px solid var(--d-border);
-    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-    border-radius:16px;padding:18px 20px;
-  }
-  #dashboard .sm-stat-label{
-    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
-    font-size:10px;letter-spacing:2px;text-transform:uppercase;
-    color:var(--d-muted);font-weight:600;margin-bottom:8px;
-  }
-  #dashboard .sm-stat-value{
-    color:var(--d-text);font-size:28px;font-weight:800;
-    font-variant-numeric:tabular-nums;line-height:1;
-  }
-  #dashboard .sm-stat-sub{
-    color:var(--d-muted);font-size:11px;margin-top:6px;
-    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
-  }
-  #dashboard .sm-roster{
-    display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
-  }
-  @media (max-width:1100px){#dashboard .sm-roster{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:480px){#dashboard .sm-roster{grid-template-columns:1fr}}
-  #dashboard .sm-card{
-    background:var(--d-surface);border:1px solid var(--d-border);
-    border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;
-    transition:border-color 0.15s, transform 0.15s;
-  }
-  #dashboard .sm-card:hover{border-color:var(--d-border-strong);transform:translateY(-1px)}
-  #dashboard .sm-nick{
-    color:var(--d-text);font-weight:700;font-size:13px;letter-spacing:0.3px;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
-  #dashboard .sm-meta{
-    color:var(--d-muted);font-size:10px;letter-spacing:1.5px;
-    text-transform:uppercase;font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
-  }
-  #dashboard .sm-rate{
-    color:var(--d-win);font-weight:700;font-size:11px;
-    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
-    font-variant-numeric:tabular-nums;
-  }
-  #dashboard .sm-rate.is-mid{color:var(--d-pending)}
-  #dashboard .sm-rate.is-low{color:var(--d-loss)}
-  #dashboard .sm-method{
-    color:var(--d-muted);font-size:11px;line-height:1.6;margin-top:18px;
-    padding-top:14px;border-top:1px solid var(--d-border);
-    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
-    letter-spacing:0.3px;
-  }
-  #dashboard .sm-method strong{color:var(--d-text);font-weight:700}
-
   @keyframes shimmer{0%{opacity:0.45}50%{opacity:0.65}100%{opacity:0.45}}
   #dashboard .skeleton{
     background:var(--d-surface-hover);border-radius:6px;
@@ -511,39 +453,6 @@
       <div class="chart-foot">
         <span>$100 stake / call</span>
         <span class="pnl" id="d-pnl">—</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="sm-section">
-    <div class="d-label">Smart money pool</div>
-    <div class="sm-stats">
-      <div class="sm-stat">
-        <div class="sm-stat-label">Wallets tracked</div>
-        <div class="sm-stat-value" id="sm-wallets">—</div>
-        <div class="sm-stat-sub">top Polymarket performers</div>
-      </div>
-      <div class="sm-stat">
-        <div class="sm-stat-label">Edge vs raw pool</div>
-        <div class="sm-stat-value" id="sm-edge">—</div>
-        <div class="sm-stat-sub" id="sm-edge-sub">—</div>
-      </div>
-      <div class="sm-stat">
-        <div class="sm-stat-label">Resolved bets tracked</div>
-        <div class="sm-stat-value" id="sm-resolved">—</div>
-        <div class="sm-stat-sub"><span id="sm-pending">—</span> currently open</div>
-      </div>
-    </div>
-    <div class="panel" style="padding:18px">
-      <div class="sm-roster" id="sm-roster">
-        <div class="sm-card"><span class="sm-nick skeleton">&nbsp;</span><span class="sm-meta skeleton">&nbsp;</span><span class="sm-rate skeleton">&nbsp;</span></div>
-        <div class="sm-card"><span class="sm-nick skeleton">&nbsp;</span><span class="sm-meta skeleton">&nbsp;</span><span class="sm-rate skeleton">&nbsp;</span></div>
-        <div class="sm-card"><span class="sm-nick skeleton">&nbsp;</span><span class="sm-meta skeleton">&nbsp;</span><span class="sm-rate skeleton">&nbsp;</span></div>
-        <div class="sm-card"><span class="sm-nick skeleton">&nbsp;</span><span class="sm-meta skeleton">&nbsp;</span><span class="sm-rate skeleton">&nbsp;</span></div>
-        <div class="sm-card"><span class="sm-nick skeleton">&nbsp;</span><span class="sm-meta skeleton">&nbsp;</span><span class="sm-rate skeleton">&nbsp;</span></div>
-      </div>
-      <div class="sm-method">
-        <strong>Methodology:</strong> we track Polymarket wallets ranked by 12-month ROI, filtered for sustained volume and cross-market consistency. Identities are masked — wallet addresses are never published. Per-call attribution stays inside the Discord.
       </div>
     </div>
   </div>
@@ -785,42 +694,6 @@
           '<td class="res-status">' + dotHtml + '</td>' +
           '<td class="res-return' + retClass + '">' + ret + '</td>' +
         '</tr>';
-      }).join('');
-    }
-
-    const sm = data.smartMoney || {};
-    if ($('sm-wallets'))  $('sm-wallets').textContent  = sm.walletsTracked != null ? sm.walletsTracked : '—';
-    if ($('sm-resolved')) $('sm-resolved').textContent = sm.totalResolved != null ? sm.totalResolved.toLocaleString('en-US') : '—';
-    if ($('sm-pending'))  $('sm-pending').textContent  = sm.totalPending != null ? sm.totalPending.toLocaleString('en-US') : '—';
-
-    const polybabyAcc = c.accuracy != null ? Number(c.accuracy) : null;
-    const poolRate = sm.cohortWinRate != null ? Number(sm.cohortWinRate) : null;
-    const edgeEl = $('sm-edge');
-    const edgeSubEl = $('sm-edge-sub');
-    if (edgeEl && edgeSubEl) {
-      if (polybabyAcc != null && poolRate != null) {
-        const delta = polybabyAcc - poolRate;
-        const sign = delta >= 0 ? '+' : '';
-        edgeEl.textContent = sign + delta.toFixed(1) + ' pts';
-        edgeSubEl.textContent = 'PolyBaby ' + polybabyAcc.toFixed(1) + '% · pool ' + poolRate.toFixed(1) + '%';
-      } else {
-        edgeEl.textContent = '—';
-        edgeSubEl.textContent = '—';
-      }
-    }
-
-    const rosterEl = $('sm-roster');
-    if (rosterEl && Array.isArray(sm.roster) && sm.roster.length) {
-      rosterEl.innerHTML = sm.roster.map(t => {
-        const rate = t.winRate != null ? t.winRate.toFixed(0) + '%' : '—';
-        const rateCls = t.winRate == null ? '' : t.winRate >= 60 ? '' : t.winRate >= 50 ? ' is-mid' : ' is-low';
-        const sport = t.topCategory ? esc(fmtTag(t.topCategory)) : '—';
-        const sportRate = t.topWinPct != null ? ' · ' + t.topWinPct + '%' : '';
-        return '<div class="sm-card">' +
-          '<span class="sm-nick">' + esc(t.nickname) + '</span>' +
-          '<span class="sm-meta">' + sport + sportRate + '</span>' +
-          '<span class="sm-rate' + rateCls + '">' + rate + ' lifetime · ' + t.resolved + ' resolved</span>' +
-        '</div>';
       }).join('');
     }
 
