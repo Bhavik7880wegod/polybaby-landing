@@ -4,27 +4,24 @@ export const config = { runtime: 'edge' };
 
 const sql = neon(process.env.DATABASE_URL);
 
-// Sports-only filter: any market where deriveSport() set a specific sport,
-// OR the generic Sports category (catch-all for sports markets without a
-// specific sport regex match). Excludes Politics, Crypto, Finance, etc.
-const SPORTS_FILTER = `(sport IS NOT NULL OR category = 'Sports')`;
+// Politics is the only category hidden from public dashboard surface.
+// Politics calls are still written to Neon by the brain — we just don't
+// surface them in the visible UI. They DO factor into the aggregate
+// counter and the cumulative P&L chart so headline numbers stay honest.
+const HIDE_LABELS = ['Politics'];
 
 export default async function handler() {
   try {
     const [counterRows, categoryRows, recentRows, pnlRows] = await Promise.all([
-      // Counter — derived from sports-only calls (not the global call_counter row)
+      // Counter — global totals across ALL categories (politics included)
       sql`
-        SELECT
-          SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
-          SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
-          SUM(CASE WHEN outcome = 'pending' THEN 1 ELSE 0 END)::int AS pending,
-          COUNT(*)::int AS total_calls,
-          ROUND(100.0 * SUM(CASE WHEN outcome = 'WIN' THEN 1 ELSE 0 END) /
-            NULLIF(SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END), 0), 1)::float AS accuracy,
-          MAX(updated_at) AS updated_at
-        FROM calls
-        WHERE (sport IS NOT NULL OR category = 'Sports')
+        SELECT next_id, wins, losses, pending,
+               ROUND(100.0 * wins / NULLIF(wins + losses, 0), 1)::float AS accuracy,
+               updated_at
+        FROM call_counter
+        LIMIT 1
       `,
+      // Categories — hide Politics only; everything else shows
       sql`
         SELECT
           COALESCE(sport, category) AS label,
@@ -33,14 +30,15 @@ export default async function handler() {
           SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
         FROM calls
-        WHERE (sport IS NOT NULL OR category = 'Sports')
-          AND COALESCE(sport, category) IS NOT NULL
+        WHERE COALESCE(sport, category) IS NOT NULL
           AND COALESCE(sport, category) <> 'Other'
+          AND COALESCE(sport, category) <> 'Politics'
         GROUP BY label
         HAVING COUNT(*) >= 3
         ORDER BY calls DESC
         LIMIT 12
       `,
+      // Recent calls — hide Politics
       sql`
         SELECT
           call_number, market_question, market_url,
@@ -50,10 +48,12 @@ export default async function handler() {
           outcome, timestamp, updated_at
         FROM calls
         WHERE (archived = FALSE OR archived IS NULL)
-          AND (sport IS NOT NULL OR category = 'Sports')
+          AND (category IS NULL OR category <> 'Politics')
         ORDER BY call_number DESC
         LIMIT 20
       `,
+      // P&L series — include ALL resolved calls (politics included)
+      // so the cumulative chart matches the headline counter.
       sql`
         SELECT
           call_number,
@@ -65,12 +65,17 @@ export default async function handler() {
           END)::float8 AS profit
         FROM calls
         WHERE outcome IN ('WIN', 'LOSS')
-          AND (sport IS NOT NULL OR category = 'Sports')
         ORDER BY timestamp ASC
       `,
     ]);
 
-    const counter = counterRows[0] ?? { wins: 0, losses: 0, pending: 0, total_calls: 0, accuracy: 0, updated_at: null };
+    const counter = counterRows[0];
+    if (!counter) {
+      return new Response(
+        JSON.stringify({ error: 'no counter row' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     const categories = categoryRows.map(r => ({
       label: r.label,
@@ -115,7 +120,7 @@ export default async function handler() {
         wins: counter.wins,
         losses: counter.losses,
         pending: counter.pending,
-        nextId: counter.total_calls,
+        nextId: counter.next_id,
         total: counter.wins + counter.losses,
         accuracy: counter.accuracy != null ? counter.accuracy.toFixed(1) : '0.0',
       },
@@ -123,7 +128,7 @@ export default async function handler() {
       recentCalls,
       pnlSeries,
       lastUpdated: counter.updated_at,
-      filter: 'sports-only',
+      hidden: HIDE_LABELS,
     };
 
     return new Response(JSON.stringify(body), {
