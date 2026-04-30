@@ -118,15 +118,24 @@
     .footer-strip > div{width:100%}
   }
 
-  /* Jump-to-dashboard link (uses .footer-strip styling + modifier) */
+  /* Jump-to-dashboard link — gradient text + glow */
   .footer-strip.footer-jump{
-    justify-content:center;text-decoration:none;color:#666;
-    cursor:pointer;transition:color 0.18s,border-color 0.18s;
+    justify-content:center;text-decoration:none;cursor:pointer;
     margin-top:24px;
+    border-top:1px solid rgba(236,72,153,0.28);
+    background:linear-gradient(90deg,#EC4899 0%,#FF9C7A 50%,#FFD43B 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    font-weight:800;font-size:13px;letter-spacing:3.5px;
+    filter:drop-shadow(0 0 14px rgba(236,72,153,0.4));
+    transition:filter 0.2s,letter-spacing 0.2s,border-top-color 0.2s;
   }
-  .footer-strip.footer-jump:hover{color:#EC4899;border-top-color:rgba(236,72,153,0.35)}
+  .footer-strip.footer-jump:hover{
+    filter:drop-shadow(0 0 26px rgba(236,72,153,0.75));
+    letter-spacing:4.5px;border-top-color:rgba(255,212,59,0.6);
+  }
   .footer-strip.footer-jump .arrow{
-    display:inline-block;margin-left:6px;
+    display:inline-block;margin-left:8px;
     animation:jumpBounce 2s ease-in-out infinite;
   }
   @keyframes jumpBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
@@ -210,7 +219,7 @@
 
   #dashboard .categories-list{display:flex;flex-direction:column}
   #dashboard .cat-row{
-    display:grid;grid-template-columns:60px 1fr 70px 50px 14px;
+    display:grid;grid-template-columns:90px 1fr 70px 50px 14px;
     align-items:center;gap:10px;padding:11px 6px;
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
     font-size:12px;font-variant-numeric:tabular-nums;
@@ -275,7 +284,7 @@
   #dashboard .cc-return{color:var(--d-text);font-variant-numeric:tabular-nums}
   #dashboard .cc-return.is-win{color:var(--d-win)}
 
-  #dashboard .calls-cta{display:flex;justify-content:center;margin-top:12px}
+  #dashboard .calls-cta{display:flex;justify-content:center;margin-top:8px}
   #dashboard .calls-cta a{
     display:inline-flex;align-items:center;gap:10px;
     background:linear-gradient(90deg,#EC4899 0%,#FF9C7A 50%,#FFD43B 100%);
@@ -315,7 +324,7 @@
   #dashboard .res-table tbody tr:hover{background:var(--d-surface-hover)}
   #dashboard .res-table tbody td{padding:14px 14px;border-bottom:1px solid var(--d-border);color:var(--d-text)}
   #dashboard .res-table .res-date{color:var(--d-muted);width:85px}
-  #dashboard .res-table .res-tag{color:var(--d-muted-strong);width:70px;letter-spacing:1px;text-transform:uppercase;font-weight:700;font-size:11px}
+  #dashboard .res-table .res-tag{color:var(--d-muted-strong);width:95px;letter-spacing:1px;text-transform:uppercase;font-weight:700;font-size:11px}
   #dashboard .res-table .res-market{max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #dashboard .res-table .res-side{color:var(--d-muted-strong);width:130px}
   #dashboard .res-table .res-status{width:60px;text-align:center;font-size:14px}
@@ -431,9 +440,9 @@
           <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
           <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
         </div>
-        <div class="calls-cta">
-          <a href="https://discord.gg/Ba6ZgHANKK">See live calls in Discord →</a>
-        </div>
+      </div>
+      <div class="calls-cta">
+        <a href="https://discord.gg/Ba6ZgHANKK">See live calls in Discord →</a>
       </div>
     </div>
 
@@ -553,11 +562,14 @@
   (async function() {
     const $ = (id) => document.getElementById(id);
     const TAGS = {
-      'NBA':'NBA','NFL':'NFL','MLB':'MLB','NHL':'NHL','Soccer':'SOC','Tennis':'TEN',
-      'UFC':'UFC','Combat':'UFC','F1':'F1','Cricket':'CRI','Esports':'ESP','Golf':'GOLF',
-      'Crypto':'CRY','Politics':'POL','Finance':'FIN','Weather':'WEA','Tech':'TEC','Sports':'SPT'
+      'NBA':'NBA','NFL':'NFL','MLB':'MLB','NHL':'NHL',
+      'Soccer':'SOCCER','Tennis':'TENNIS',
+      'UFC':'UFC','Combat':'UFC','F1':'F1',
+      'Cricket':'CRICKET','Esports':'ESPORTS','Golf':'GOLF',
+      'Crypto':'CRYPTO','Politics':'POLITICS','Finance':'FINANCE',
+      'Weather':'WEATHER','Tech':'TECH','Sports':'SPORTS'
     };
-    const fmtTag = (l) => l ? (TAGS[l] || l.toUpperCase().slice(0,5)) : '—';
+    const fmtTag = (l) => l ? (TAGS[l] || l.toUpperCase()) : '—';
     const dotClass = (rate) => rate == null ? 'dot-pending'
       : rate >= 60 ? 'dot-win' : rate >= 50 ? 'dot-pending' : 'dot-loss';
     const fmtDate = (iso) => {

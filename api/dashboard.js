@@ -4,16 +4,26 @@ export const config = { runtime: 'edge' };
 
 const sql = neon(process.env.DATABASE_URL);
 
+// Sports-only filter: any market where deriveSport() set a specific sport,
+// OR the generic Sports category (catch-all for sports markets without a
+// specific sport regex match). Excludes Politics, Crypto, Finance, etc.
+const SPORTS_FILTER = `(sport IS NOT NULL OR category = 'Sports')`;
+
 export default async function handler() {
   try {
     const [counterRows, categoryRows, recentRows, pnlRows] = await Promise.all([
+      // Counter — derived from sports-only calls (not the global call_counter row)
       sql`
         SELECT
-          next_id, wins, losses, pending,
-          ROUND(100.0 * wins / NULLIF(wins + losses, 0), 1)::float AS accuracy,
-          updated_at
-        FROM call_counter
-        LIMIT 1
+          SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
+          SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
+          SUM(CASE WHEN outcome = 'pending' THEN 1 ELSE 0 END)::int AS pending,
+          COUNT(*)::int AS total_calls,
+          ROUND(100.0 * SUM(CASE WHEN outcome = 'WIN' THEN 1 ELSE 0 END) /
+            NULLIF(SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END), 0), 1)::float AS accuracy,
+          MAX(updated_at) AS updated_at
+        FROM calls
+        WHERE (sport IS NOT NULL OR category = 'Sports')
       `,
       sql`
         SELECT
@@ -23,7 +33,8 @@ export default async function handler() {
           SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
         FROM calls
-        WHERE COALESCE(sport, category) IS NOT NULL
+        WHERE (sport IS NOT NULL OR category = 'Sports')
+          AND COALESCE(sport, category) IS NOT NULL
           AND COALESCE(sport, category) <> 'Other'
         GROUP BY label
         HAVING COUNT(*) >= 3
@@ -38,7 +49,8 @@ export default async function handler() {
           verdict, verdict_emoji, confidence, confidence_emoji,
           outcome, timestamp, updated_at
         FROM calls
-        WHERE archived = FALSE OR archived IS NULL
+        WHERE (archived = FALSE OR archived IS NULL)
+          AND (sport IS NOT NULL OR category = 'Sports')
         ORDER BY call_number DESC
         LIMIT 20
       `,
@@ -53,17 +65,12 @@ export default async function handler() {
           END)::float8 AS profit
         FROM calls
         WHERE outcome IN ('WIN', 'LOSS')
+          AND (sport IS NOT NULL OR category = 'Sports')
         ORDER BY timestamp ASC
       `,
     ]);
 
-    const counter = counterRows[0];
-    if (!counter) {
-      return new Response(
-        JSON.stringify({ error: 'no counter row' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    const counter = counterRows[0] ?? { wins: 0, losses: 0, pending: 0, total_calls: 0, accuracy: 0, updated_at: null };
 
     const categories = categoryRows.map(r => ({
       label: r.label,
@@ -108,7 +115,7 @@ export default async function handler() {
         wins: counter.wins,
         losses: counter.losses,
         pending: counter.pending,
-        nextId: counter.next_id,
+        nextId: counter.total_calls,
         total: counter.wins + counter.losses,
         accuracy: counter.accuracy != null ? counter.accuracy.toFixed(1) : '0.0',
       },
@@ -116,6 +123,7 @@ export default async function handler() {
       recentCalls,
       pnlSeries,
       lastUpdated: counter.updated_at,
+      filter: 'sports-only',
     };
 
     return new Response(JSON.stringify(body), {
