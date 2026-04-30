@@ -293,6 +293,11 @@
   #dashboard .cat-count{color:var(--d-muted);font-size:11px;text-align:right}
   #dashboard .cat-rate{color:var(--d-text);text-align:right;font-size:11px;font-weight:600}
   #dashboard .cat-dot{font-size:13px;line-height:1;text-align:center}
+  #dashboard .cat-footer{
+    margin-top:12px;padding-top:10px;border-top:1px solid var(--d-border);
+    color:var(--d-muted);font-size:10.5px;line-height:1.5;letter-spacing:0.2px;
+  }
+  #dashboard .cat-footer:empty{display:none}
   .dot-win{color:#22D478}
   .dot-loss{color:#E0556B}
   .dot-pending{color:#E0B856}
@@ -485,12 +490,13 @@
 
   <div class="d-grid">
     <div class="panel">
-      <div class="d-label" title="Headline reflects all resolutions ever recorded (including reversals). Per-league rows show currently-tracked calls only.">Categories</div>
+      <div class="d-label">Categories</div>
       <div class="categories-list" id="d-categories">
         <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
         <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
         <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
       </div>
+      <div class="cat-footer" id="d-cat-footer"></div>
     </div>
 
     <div class="calls-area">
@@ -738,6 +744,26 @@
           '</div>'
         : '';
       catEl.innerHTML = rows + tail;
+
+      // Two-tier framing: per-league rows reflect "currently tracked" calls;
+      // the headline above is the brain's lifetime counter (which includes
+      // resolutions for calls predating the Neon migration). The footer
+      // makes that relationship explicit so visitors don't have to add up
+      // the rows and wonder why they don't equal the headline.
+      const footerEl = $('d-cat-footer');
+      if (footerEl) {
+        const trackedCalls = data.categories.reduce((s, c) => s + (c.calls || 0), 0)
+          + (insider.calls || 0);
+        const counter = data.counter || {};
+        const lifetimeCalls = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
+        const leagueCount = data.categories.filter(c => (c.calls || 0) > 0).length;
+        footerEl.innerHTML =
+          'Currently tracking <strong>' + trackedCalls + '</strong> calls across '
+          + leagueCount + ' ' + (leagueCount === 1 ? 'sport' : 'sports')
+          + (insider.calls > 0 ? ' + ' + esc(insider.displayLabel || 'Insider') : '')
+          + '. Headline reflects all-time record across <strong>' + lifetimeCalls
+          + '</strong> resolutions since launch.';
+      }
     }
 
     const callsEl = $('d-calls');
