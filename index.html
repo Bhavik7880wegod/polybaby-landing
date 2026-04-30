@@ -8,10 +8,11 @@
 <meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Modak&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Modak&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Inter','Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+  html,body{min-height:100%;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Inter','Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  html{scroll-behavior:smooth}
 
   .page{height:100vh;display:flex;flex-direction:column;padding:32px 48px}
 
@@ -116,6 +117,232 @@
     .footer-strip{font-size:10px;letter-spacing:1px;justify-content:center;text-align:center}
     .footer-strip > div{width:100%}
   }
+
+  /* Jump-to-dashboard link (uses .footer-strip styling + modifier) */
+  .footer-strip.footer-jump{
+    justify-content:center;text-decoration:none;color:#666;
+    cursor:pointer;transition:color 0.18s,border-color 0.18s;
+    margin-top:24px;
+  }
+  .footer-strip.footer-jump:hover{color:#EC4899;border-top-color:rgba(236,72,153,0.35)}
+  .footer-strip.footer-jump .arrow{
+    display:inline-block;margin-left:6px;
+    animation:jumpBounce 2s ease-in-out infinite;
+  }
+  @keyframes jumpBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+  /* Bottom footer (after dashboard, outside .page so needs its own horizontal padding) */
+  .footer-strip.footer-bottom{
+    padding:20px 48px 28px;margin-top:0;
+    border-top:1px solid #1A1A1A;
+  }
+  @media (max-width:768px){
+    .footer-strip.footer-bottom{padding:16px 20px 24px}
+  }
+
+  /* ═══════════ Dashboard section ═══════════ */
+  #dashboard{
+    --d-surface:rgba(255,255,255,0.04);
+    --d-surface-hover:rgba(255,255,255,0.07);
+    --d-border:rgba(255,255,255,0.08);
+    --d-border-strong:rgba(255,255,255,0.16);
+    --d-text:#F4F6FA;
+    --d-muted:#888;
+    --d-muted-strong:#aaa;
+    --d-accent:#EC4899;
+    --d-win:#22D478;
+    --d-loss:#E0556B;
+    --d-pending:#E0B856;
+    position:relative;background:#000;padding:64px 48px 120px;
+    overflow:hidden;color:var(--d-text);
+  }
+  #dashboard::before,#dashboard::after{
+    content:'';position:absolute;width:600px;height:600px;border-radius:50%;
+    filter:blur(100px);pointer-events:none;z-index:0;
+  }
+  #dashboard::before{
+    background:radial-gradient(circle,rgba(236,72,153,0.18) 0%,transparent 70%);
+    top:-200px;left:-150px;animation:drift1 80s ease-in-out infinite;
+  }
+  #dashboard::after{
+    background:radial-gradient(circle,rgba(255,156,122,0.13) 0%,transparent 70%);
+    top:30%;right:-200px;animation:drift2 90s ease-in-out infinite;
+  }
+  @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(120px,80px)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-80px,-100px)}}
+  #dashboard > *{position:relative;z-index:1}
+
+  #dashboard .d-stats-wrap{display:flex;justify-content:center;margin-bottom:56px}
+  #dashboard .d-hero-stats{
+    display:inline-flex;align-items:center;gap:18px;
+    padding:18px 28px;background:var(--d-surface);
+    border:1px solid var(--d-border);border-radius:999px;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-variant-numeric:tabular-nums;font-size:13px;letter-spacing:0.5px;
+  }
+  #dashboard .d-hero-stats .sep{color:var(--d-border-strong);user-select:none}
+  #dashboard .d-hero-stats .stat-label{
+    color:var(--d-muted);text-transform:uppercase;font-size:10px;
+    letter-spacing:1.8px;margin-right:6px;font-weight:500;
+  }
+  #dashboard .d-hero-stats .stat-value{color:var(--d-text);font-weight:700}
+  #dashboard .d-hero-stats .last5{display:inline-flex;gap:5px;font-size:14px;line-height:1}
+
+  #dashboard .d-label{
+    font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
+    color:var(--d-muted);font-weight:600;margin-bottom:14px;
+    display:flex;align-items:center;gap:12px;
+  }
+  #dashboard .d-label::after{content:'';flex:1;height:1px;background:var(--d-border)}
+
+  #dashboard .d-grid{
+    display:grid;grid-template-columns:280px 1fr 360px;gap:24px;
+    max-width:1280px;margin:0 auto;
+  }
+  @media (max-width:1100px){#dashboard .d-grid{grid-template-columns:1fr}}
+
+  #dashboard .panel{
+    background:var(--d-surface);border:1px solid var(--d-border);
+    border-radius:16px;backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);padding:24px;
+  }
+
+  #dashboard .categories-list{display:flex;flex-direction:column}
+  #dashboard .cat-row{
+    display:grid;grid-template-columns:60px 1fr 70px 50px 14px;
+    align-items:center;gap:10px;padding:11px 6px;
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:12px;font-variant-numeric:tabular-nums;
+    border-top:1px solid var(--d-border);transition:background 0.15s;
+  }
+  #dashboard .cat-row:first-child{border-top:none}
+  #dashboard .cat-row:hover{background:var(--d-surface-hover)}
+  #dashboard .cat-label{color:var(--d-text);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px}
+  #dashboard .cat-bar{height:1px;background:var(--d-border-strong);opacity:0.4}
+  #dashboard .cat-count{color:var(--d-muted);font-size:11px}
+  #dashboard .cat-rate{color:var(--d-text);text-align:right;font-size:11px;font-weight:600}
+  #dashboard .cat-dot{font-size:13px;line-height:1;text-align:center}
+  .dot-win{color:#22D478}
+  .dot-loss{color:#E0556B}
+  .dot-pending{color:#E0B856}
+
+  #dashboard .calls-area{display:flex;flex-direction:column;gap:12px}
+  #dashboard .calls-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:720px){#dashboard .calls-grid{grid-template-columns:1fr}}
+
+  #dashboard .call-card{
+    display:flex;flex-direction:column;gap:14px;padding:18px;
+    background:var(--d-surface);border:1px solid var(--d-border);
+    border-radius:14px;backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    transition:transform 0.15s,border-color 0.15s,background 0.15s;
+    text-decoration:none;color:inherit;
+  }
+  #dashboard .call-card:hover{
+    transform:translateY(-2px);border-color:var(--d-accent);
+    background:var(--d-surface-hover);
+  }
+  #dashboard .cc-top{
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  }
+  #dashboard .cc-tag{color:var(--d-muted);font-weight:700}
+  #dashboard .cc-status{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+  #dashboard .cc-status.is-live{color:var(--d-pending)}
+  #dashboard .cc-status.is-win{color:var(--d-win)}
+  #dashboard .cc-status.is-loss{color:var(--d-loss)}
+  #dashboard .cc-status .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  #dashboard .cc-status.is-live .dot{animation:blink 1.6s infinite}
+  #dashboard .cc-title{
+    font-size:14px;font-weight:600;line-height:1.35;color:var(--d-text);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  #dashboard .cc-side{
+    font-size:12px;color:var(--d-muted-strong);
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-variant-numeric:tabular-nums;
+  }
+  #dashboard .cc-divider{height:1px;background:var(--d-border)}
+  #dashboard .cc-meta{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--d-muted);font-weight:600;
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+  }
+  #dashboard .cc-return{color:var(--d-text);font-variant-numeric:tabular-nums}
+  #dashboard .cc-return.is-win{color:var(--d-win)}
+
+  #dashboard .calls-cta{display:flex;justify-content:center;margin-top:12px}
+  #dashboard .calls-cta a{
+    display:inline-flex;align-items:center;gap:10px;
+    background:linear-gradient(90deg,#EC4899 0%,#FF9C7A 50%,#FFD43B 100%);
+    color:#000;padding:14px 28px;border-radius:999px;font-weight:700;
+    font-size:13px;text-decoration:none;letter-spacing:1.5px;
+    text-transform:uppercase;transition:transform 0.15s,box-shadow 0.15s;
+  }
+  #dashboard .calls-cta a:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(236,72,153,0.4)}
+
+  #dashboard .chart-panel{display:flex;flex-direction:column}
+  #dashboard .chart-host{flex:1;min-height:240px}
+  #dashboard .chart-foot{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--d-muted);font-weight:600;margin-top:12px;
+    padding-top:12px;border-top:1px solid var(--d-border);
+  }
+  #dashboard .chart-foot .pnl{
+    font-size:18px;letter-spacing:0;text-transform:none;
+    color:var(--d-win);font-weight:700;font-variant-numeric:tabular-nums;
+  }
+  #dashboard .chart-foot .pnl.is-neg{color:var(--d-loss)}
+
+  #dashboard .res-section{max-width:1280px;margin:56px auto 0}
+  #dashboard .res-table{
+    width:100%;border-collapse:collapse;
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:12px;font-variant-numeric:tabular-nums;
+  }
+  #dashboard .res-table thead th{
+    text-align:left;font-size:10px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--d-muted);font-weight:600;
+    padding:14px 14px;border-bottom:1px solid var(--d-border-strong);
+  }
+  #dashboard .res-table tbody tr{transition:background 0.15s}
+  #dashboard .res-table tbody tr:hover{background:var(--d-surface-hover)}
+  #dashboard .res-table tbody td{padding:14px 14px;border-bottom:1px solid var(--d-border);color:var(--d-text)}
+  #dashboard .res-table .res-date{color:var(--d-muted);width:85px}
+  #dashboard .res-table .res-tag{color:var(--d-muted-strong);width:70px;letter-spacing:1px;text-transform:uppercase;font-weight:700;font-size:11px}
+  #dashboard .res-table .res-market{max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #dashboard .res-table .res-side{color:var(--d-muted-strong);width:130px}
+  #dashboard .res-table .res-status{width:60px;text-align:center;font-size:14px}
+  #dashboard .res-table .res-return{width:80px;text-align:right;color:var(--d-muted)}
+  #dashboard .res-table .res-return.is-win{color:var(--d-win)}
+  @media (max-width:720px){
+    #dashboard .res-table .res-date,
+    #dashboard .res-table .res-side{display:none}
+  }
+
+  @keyframes shimmer{0%{opacity:0.45}50%{opacity:0.65}100%{opacity:0.45}}
+  #dashboard .skeleton{
+    background:var(--d-surface-hover);border-radius:6px;
+    display:inline-block;animation:shimmer 1.4s ease-in-out infinite;
+    height:1em;min-width:40px;
+  }
+
+  @media (max-width:768px){
+    #dashboard{padding:48px 20px 80px}
+    #dashboard .d-stats-wrap{margin-bottom:40px}
+    #dashboard .d-hero-stats{flex-wrap:wrap;justify-content:center;padding:14px 18px;gap:10px;font-size:11px}
+    #dashboard .d-hero-stats .sep{display:none}
+    #dashboard .res-section{margin-top:40px}
+    #dashboard .res-table thead th{font-size:9px;padding:10px 8px}
+    #dashboard .res-table tbody td{padding:12px 8px;font-size:11px}
+  }
+
 </style>
 </head>
 <body>
@@ -164,16 +391,96 @@
     </div>
   </div>
 
-  <div class="footer-strip">
-    <div>© 2026 PolyBaby · Not affiliated with Polymarket · For entertainment only</div>
-    <div>
-      <a href="mailto:bhavikarjunkakkar999@gmail.com">Contact</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="https://discord.gg/Ba6ZgHANKK">Discord</a>
+  <a href="#dashboard" class="footer-strip footer-jump">
+    <span>Jump to Dashboard <span class="arrow">↓</span></span>
+  </a>
+
+</div>
+
+<!-- ═══════════ Dashboard section ═══════════ -->
+<section id="dashboard">
+  <div class="d-stats-wrap">
+    <div class="d-hero-stats">
+      <span><span class="stat-label">Wins</span><span class="stat-value" id="d-wins">—</span></span>
+      <span class="sep">·</span>
+      <span><span class="stat-label">Total</span><span class="stat-value" id="d-total">—</span></span>
+      <span class="sep">·</span>
+      <span><span class="stat-label">Accuracy</span><span class="stat-value" id="d-accuracy">—</span></span>
+      <span class="sep">·</span>
+      <span><span class="stat-label">Streak</span><span class="stat-value" id="d-streak">—</span></span>
+      <span class="sep">·</span>
+      <span><span class="stat-label">Last 5</span><span class="last5" id="d-last5">—</span></span>
     </div>
   </div>
 
+  <div class="d-grid">
+    <div class="panel">
+      <div class="d-label">Categories</div>
+      <div class="categories-list" id="d-categories">
+        <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
+        <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
+        <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
+      </div>
+    </div>
+
+    <div class="calls-area">
+      <div class="d-label">Recent calls</div>
+      <div class="panel" style="padding:18px">
+        <div class="calls-grid" id="d-calls">
+          <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
+          <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
+          <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
+        </div>
+        <div class="calls-cta">
+          <a href="https://discord.gg/Ba6ZgHANKK">See live calls in Discord →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel chart-panel">
+      <div class="d-label">Cumulative performance</div>
+      <div class="chart-host" id="d-chart"></div>
+      <div class="chart-foot">
+        <span>$100 stake / call</span>
+        <span class="pnl" id="d-pnl">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="res-section">
+    <div class="d-label">Recent resolutions</div>
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="res-table">
+        <thead>
+          <tr>
+            <th class="res-date">Date</th>
+            <th class="res-tag">Tag</th>
+            <th>Market</th>
+            <th class="res-side">Side</th>
+            <th class="res-status">Result</th>
+            <th class="res-return">Return</th>
+          </tr>
+        </thead>
+        <tbody id="d-res-body">
+          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<!-- ═══════════ /Dashboard section ═══════════ -->
+
+<div class="footer-strip footer-bottom">
+  <div>© 2026 PolyBaby · Not affiliated with Polymarket · For entertainment only</div>
+  <div>
+    <a href="mailto:bhavikarjunkakkar999@gmail.com">Contact</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://discord.gg/Ba6ZgHANKK">Discord</a>
+  </div>
 </div>
+
 
 <!-- Lifetime Access waitlist modal -->
 <div id="waitlist-modal" class="modal-overlay" role="dialog" aria-hidden="true">
@@ -189,6 +496,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
   // Live countdown to June 1, 2026 (going private) — ticks every second
   (function() {
@@ -240,6 +548,201 @@
   if (closeBtn) closeBtn.addEventListener('click', close);
   modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+  // ═══════════ Dashboard ═══════════
+  (async function() {
+    const $ = (id) => document.getElementById(id);
+    const TAGS = {
+      'NBA':'NBA','NFL':'NFL','MLB':'MLB','NHL':'NHL','Soccer':'SOC','Tennis':'TEN',
+      'UFC':'UFC','Combat':'UFC','F1':'F1','Cricket':'CRI','Esports':'ESP','Golf':'GOLF',
+      'Crypto':'CRY','Politics':'POL','Finance':'FIN','Weather':'WEA','Tech':'TEC','Sports':'SPT'
+    };
+    const fmtTag = (l) => l ? (TAGS[l] || l.toUpperCase().slice(0,5)) : '—';
+    const dotClass = (rate) => rate == null ? 'dot-pending'
+      : rate >= 60 ? 'dot-win' : rate >= 50 ? 'dot-pending' : 'dot-loss';
+    const fmtDate = (iso) => {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return '—';
+      return String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    };
+    const fmtMoney = (n) => {
+      if (n == null || isNaN(n)) return '—';
+      const sign = n >= 0 ? '+' : '−';
+      const abs = Math.abs(n);
+      return abs >= 1000
+        ? sign + '$' + Math.round(abs).toLocaleString()
+        : sign + '$' + abs.toFixed(0);
+    };
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    let data;
+    try {
+      const r = await fetch('/api/dashboard', { cache: 'no-store' });
+      if (!r.ok) throw new Error('fetch ' + r.status);
+      data = await r.json();
+    } catch (e) {
+      console.warn('dashboard load failed', e);
+      return;
+    }
+
+    const c = data.counter || {};
+    if ($('d-wins'))     $('d-wins').textContent = c.wins ?? '—';
+    if ($('d-total'))    $('d-total').textContent = c.total ?? '—';
+    if ($('d-accuracy')) $('d-accuracy').textContent = (c.accuracy ?? '—') + '%';
+    if ($('d-nav-live')) $('d-nav-live').textContent = (c.wins ?? '—') + ' / ' + (c.total ?? '—') + ' · ' + (c.accuracy ?? '—') + '%';
+
+    const pnl = Array.isArray(data.pnlSeries) ? data.pnlSeries : [];
+    const perCall = pnl.map((p, i) => ({
+      ...p,
+      profit: p.cumulativeReturn - (i > 0 ? pnl[i-1].cumulativeReturn : 0)
+    }));
+    if (perCall.length) {
+      const last = perCall[perCall.length - 1];
+      const lastWin = last.profit > 0;
+      let streakN = 0;
+      for (let i = perCall.length - 1; i >= 0; i--) {
+        if ((perCall[i].profit > 0) === lastWin) streakN++; else break;
+      }
+      $('d-streak').textContent = streakN + (lastWin ? 'W' : 'L');
+      $('d-last5').innerHTML = perCall.slice(-5).map(p =>
+        p.profit > 0
+          ? '<span class="dot dot-win">●</span>'
+          : '<span class="dot dot-loss">●</span>'
+      ).join('');
+    } else {
+      $('d-streak').textContent = '—';
+      $('d-last5').textContent = '—';
+    }
+
+    const catEl = $('d-categories');
+    if (catEl && Array.isArray(data.categories) && data.categories.length) {
+      catEl.innerHTML = data.categories.map(cat => {
+        const rateText = cat.winRate != null ? cat.winRate.toFixed(0) + '%' : '—';
+        return '<div class="cat-row">' +
+          '<span class="cat-label">' + esc(fmtTag(cat.label)) + '</span>' +
+          '<span class="cat-bar"></span>' +
+          '<span class="cat-count">' + cat.calls + ' ' + (cat.calls === 1 ? 'call' : 'calls') + '</span>' +
+          '<span class="cat-rate">' + rateText + '</span>' +
+          '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    const callsEl = $('d-calls');
+    if (callsEl && Array.isArray(data.recentCalls) && data.recentCalls.length) {
+      callsEl.innerHTML = data.recentCalls.slice(0, 3).map(call => {
+        const tag = esc(fmtTag(call.sport));
+        const status = call.outcome === 'WIN' ? 'is-win'
+          : call.outcome === 'LOSS' ? 'is-loss' : 'is-live';
+        const statusLabel = call.outcome === 'WIN' ? 'WIN'
+          : call.outcome === 'LOSS' ? 'LOSS' : 'LIVE';
+        const sideLine = (call.side && call.entryPrice)
+          ? 'Buy ' + esc(call.side) + ' @ ' + Math.round(call.entryPrice * 100) + '%'
+          : '—';
+        const isWin = call.outcome === 'WIN' && call.returnPct != null;
+        const returnText = isWin ? '+' + call.returnPct + '%'
+          : call.outcome === 'LOSS' ? '—'
+          : (call.returnPct != null ? '+' + call.returnPct + '% if W' : '—');
+        const url = esc(call.marketUrl || 'https://discord.gg/Ba6ZgHANKK');
+        const conf = esc(call.confidence || '—').replace(/—\s*single-trader.*/i, 'LOW');
+        return '<a class="call-card" href="' + url + '" target="_blank" rel="noopener noreferrer">' +
+          '<div class="cc-top">' +
+            '<span class="cc-tag">' + tag + ' · #' + call.callNumber + '</span>' +
+            '<span class="cc-status ' + status + '"><span class="dot"></span>' + statusLabel + '</span>' +
+          '</div>' +
+          '<div class="cc-title">' + esc(call.marketTitle) + '</div>' +
+          '<div class="cc-side">' + sideLine + '</div>' +
+          '<div class="cc-divider"></div>' +
+          '<div class="cc-meta">' +
+            '<span>' + conf + '</span>' +
+            '<span class="cc-return ' + (isWin ? 'is-win' : '') + '">' + returnText + '</span>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    }
+
+    const resEl = $('d-res-body');
+    if (resEl && Array.isArray(data.recentCalls) && data.recentCalls.length) {
+      resEl.innerHTML = data.recentCalls.slice(0, 20).map(call => {
+        const dotHtml = call.outcome === 'WIN'  ? '<span class="dot-win">●</span>'
+                     : call.outcome === 'LOSS' ? '<span class="dot-loss">●</span>'
+                     : '<span class="dot-pending">○</span>';
+        const ret = call.outcome === 'WIN' && call.returnPct != null
+          ? '+' + call.returnPct + '%' : '—';
+        const retClass = call.outcome === 'WIN' ? ' is-win' : '';
+        const date = fmtDate(call.updatedAt || call.timestamp);
+        return '<tr>' +
+          '<td class="res-date">' + date + '</td>' +
+          '<td class="res-tag">' + esc(fmtTag(call.sport)) + '</td>' +
+          '<td class="res-market">' + esc(call.marketTitle) + '</td>' +
+          '<td class="res-side">' + esc(call.side || '—') + '</td>' +
+          '<td class="res-status">' + dotHtml + '</td>' +
+          '<td class="res-return' + retClass + '">' + ret + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    if (typeof ApexCharts !== 'undefined' && pnl.length) {
+      const series = pnl.map(p => ({ x: p.ts, y: Math.round(p.cumulativeReturn) }));
+      const finalPnl = pnl[pnl.length - 1].cumulativeReturn;
+      const isPos = finalPnl >= 0;
+      const pnlEl = $('d-pnl');
+      if (pnlEl) {
+        pnlEl.textContent = fmtMoney(finalPnl);
+        pnlEl.classList.toggle('is-neg', !isPos);
+      }
+      const chartEl = $('d-chart');
+      if (chartEl) {
+        new ApexCharts(chartEl, {
+          chart: {
+            type: 'area', height: 240, toolbar: { show: false }, zoom: { enabled: false },
+            background: 'transparent',
+            animations: { enabled: true, easing: 'easeinout', speed: 600 }
+          },
+          series: [{ name: 'Cumulative', data: series }],
+          xaxis: {
+            type: 'datetime',
+            labels: {
+              style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' }
+            },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+          },
+          yaxis: {
+            labels: {
+              style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' },
+              formatter: (v) => v >= 0 ? '+$' + Math.round(v) : '−$' + Math.round(Math.abs(v))
+            }
+          },
+          stroke: { curve: 'smooth', width: 2, colors: ['#EC4899'] },
+          fill: {
+            type: 'gradient',
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.45,
+              opacityTo: 0,
+              stops: [0, 100]
+            }
+          },
+          colors: ['#EC4899'],
+          grid: {
+            borderColor: 'rgba(255,255,255,0.06)',
+            strokeDashArray: 4,
+            xaxis: { lines: { show: false } }
+          },
+          tooltip: {
+            theme: 'dark',
+            x: { format: 'dd MMM yyyy' },
+            y: { formatter: (v) => v >= 0 ? '+$' + v : '−$' + Math.abs(v) }
+          },
+          dataLabels: { enabled: false },
+          legend: { show: false }
+        }).render();
+      }
+    }
+  })();
 </script>
 
 </body>
