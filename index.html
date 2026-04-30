@@ -263,18 +263,13 @@
 
   #dashboard .d-grid{
     display:grid;grid-template-columns:280px 1fr 360px;gap:24px;
-    align-items:stretch;
+    align-items:start;
     max-width:1280px;margin:0 auto;
   }
-  /* Categories panel stretches to grid-row height; the rows vertically
-     center inside the panel so they sit middle-aligned with the
-     recent-calls cards (which are taller because of richer content). */
-  #dashboard .d-grid > .panel:first-child{
-    display:flex;flex-direction:column;
-  }
-  #dashboard .d-grid > .panel:first-child .categories-list{
-    flex:1;justify-content:center;
-  }
+  /* Categories panel keeps its compact natural size, but vertically
+     centers within the grid row so it lines up with the middle of the
+     taller recent-calls column instead of floating at the top. */
+  #dashboard .d-grid > .panel:first-child{align-self:center}
   @media (max-width:1100px){#dashboard .d-grid{grid-template-columns:1fr}}
 
   #dashboard .panel{
