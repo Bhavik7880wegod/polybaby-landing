@@ -89,10 +89,26 @@ export default async function handler() {
     // Reconcile the categories panel against the headline counter so
     // visitors don't see "215 visible vs 463 total" and assume broken math.
     // Politics + Other + small/long-tail categories are deliberately hidden;
-    // surface the delta as a single muted "+ N other" row.
+    // surface the delta as a single muted "+ N other" row, with the actual
+    // blended win rate of the hidden bucket so the math fully reconciles.
     const totalCallsAcrossAll = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
     const visibleCallsSum = categories.reduce((a, c) => a + c.calls, 0);
-    const categoriesHiddenCount = Math.max(0, totalCallsAcrossAll - visibleCallsSum);
+    const visibleWinsSum   = categories.reduce((a, c) => a + (c.wins || 0), 0);
+    const visibleLossesSum = categories.reduce((a, c) => a + (c.losses || 0), 0);
+    const hiddenWins   = Math.max(0, (counter.wins   || 0) - visibleWinsSum);
+    const hiddenLosses = Math.max(0, (counter.losses || 0) - visibleLossesSum);
+    const hiddenResolved = hiddenWins + hiddenLosses;
+    const categoriesHidden = {
+      count: Math.max(0, totalCallsAcrossAll - visibleCallsSum),
+      wins: hiddenWins,
+      losses: hiddenLosses,
+      resolved: hiddenResolved,
+      winRate: hiddenResolved > 0
+        ? Math.round((hiddenWins / hiddenResolved) * 1000) / 10
+        : null,
+    };
+    // Back-compat: keep the old top-level field so existing clients don't break.
+    const categoriesHiddenCount = categoriesHidden.count;
 
     const recentCalls = recentRows.map(r => ({
       callNumber: r.call_number,
@@ -134,6 +150,7 @@ export default async function handler() {
       },
       categories,
       categoriesHiddenCount,
+      categoriesHidden,
       recentCalls,
       pnlSeries,
       lastUpdated: counter.updated_at,

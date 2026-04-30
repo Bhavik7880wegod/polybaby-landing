@@ -687,7 +687,8 @@
 
     const catEl = $('d-categories');
     if (catEl && Array.isArray(data.categories) && data.categories.length) {
-      const hiddenCount = Number(data.categoriesHiddenCount || 0);
+      const hidden = data.categoriesHidden || { count: Number(data.categoriesHiddenCount || 0), winRate: null };
+      const hiddenCount = Number(hidden.count || 0);
       const rows = data.categories.map(cat => {
         const rateText = cat.winRate != null ? cat.winRate.toFixed(0) + '%' : '—';
         return '<div class="cat-row">' +
@@ -698,13 +699,17 @@
           '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
         '</div>';
       }).join('');
+      const hiddenRate = hidden.winRate != null
+        ? Number(hidden.winRate).toFixed(0) + '%'
+        : '—';
+      const hiddenTitle = 'Combined private + long-tail buckets — categories with under 3 calls and markets we don\'t surface individually. Counts toward the headline total and accuracy.';
       const tail = hiddenCount > 0
-        ? '<div class="cat-row cat-row-hidden">' +
-            '<span class="cat-label" style="opacity:0.55">Other</span>' +
+        ? '<div class="cat-row cat-row-hidden" title="' + esc(hiddenTitle) + '" style="opacity:0.7">' +
+            '<span class="cat-label">Other</span>' +
             '<span class="cat-bar"></span>' +
             '<span class="cat-count">' + hiddenCount + ' ' + (hiddenCount === 1 ? 'call' : 'calls') + '</span>' +
-            '<span class="cat-rate" style="opacity:0.55">—</span>' +
-            '<span class="cat-dot" style="color:var(--d-muted)">·</span>' +
+            '<span class="cat-rate">' + hiddenRate + '</span>' +
+            '<span class="cat-dot ' + dotClass(hidden.winRate) + '">●</span>' +
           '</div>'
         : '';
       catEl.innerHTML = rows + tail;
