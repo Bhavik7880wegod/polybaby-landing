@@ -524,9 +524,9 @@
         <div class="sm-stat-sub">top Polymarket performers</div>
       </div>
       <div class="sm-stat">
-        <div class="sm-stat-label">Cohort win rate</div>
-        <div class="sm-stat-value" id="sm-rate">—</div>
-        <div class="sm-stat-sub">across all resolved bets</div>
+        <div class="sm-stat-label">Edge vs raw pool</div>
+        <div class="sm-stat-value" id="sm-edge">—</div>
+        <div class="sm-stat-sub" id="sm-edge-sub">—</div>
       </div>
       <div class="sm-stat">
         <div class="sm-stat-label">Resolved bets tracked</div>
@@ -790,9 +790,24 @@
 
     const sm = data.smartMoney || {};
     if ($('sm-wallets'))  $('sm-wallets').textContent  = sm.walletsTracked != null ? sm.walletsTracked : '—';
-    if ($('sm-rate'))     $('sm-rate').textContent     = sm.cohortWinRate != null ? sm.cohortWinRate.toFixed(1) + '%' : '—';
     if ($('sm-resolved')) $('sm-resolved').textContent = sm.totalResolved != null ? sm.totalResolved.toLocaleString('en-US') : '—';
     if ($('sm-pending'))  $('sm-pending').textContent  = sm.totalPending != null ? sm.totalPending.toLocaleString('en-US') : '—';
+
+    const polybabyAcc = c.accuracy != null ? Number(c.accuracy) : null;
+    const poolRate = sm.cohortWinRate != null ? Number(sm.cohortWinRate) : null;
+    const edgeEl = $('sm-edge');
+    const edgeSubEl = $('sm-edge-sub');
+    if (edgeEl && edgeSubEl) {
+      if (polybabyAcc != null && poolRate != null) {
+        const delta = polybabyAcc - poolRate;
+        const sign = delta >= 0 ? '+' : '';
+        edgeEl.textContent = sign + delta.toFixed(1) + ' pts';
+        edgeSubEl.textContent = 'PolyBaby ' + polybabyAcc.toFixed(1) + '% · pool ' + poolRate.toFixed(1) + '%';
+      } else {
+        edgeEl.textContent = '—';
+        edgeSubEl.textContent = '—';
+      }
+    }
 
     const rosterEl = $('sm-roster');
     if (rosterEl && Array.isArray(sm.roster) && sm.roster.length) {
