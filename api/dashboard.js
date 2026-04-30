@@ -19,7 +19,7 @@ const HIDE_LABELS = INSIDER_CATEGORIES;
 
 export default async function handler() {
   try {
-    const [counterRows, categoryRows, recentRows, pnlRows, insiderRows] = await Promise.all([
+    const [counterRows, recentRows, pnlRows, insiderRows] = await Promise.all([
       // Counter — global totals across ALL categories (politics included)
       sql`
         SELECT next_id, wins, losses, pending,
@@ -27,21 +27,6 @@ export default async function handler() {
                updated_at
         FROM call_counter
         LIMIT 1
-      `,
-      // Categories — beast mode: collapse everything that isn't an Insider
-      // category into a single 'Sports' bucket. No per-league classification
-      // (kept simple while regex coverage is incomplete and seasons rotate).
-      // Brain still stores per-league sport tags going forward, so we can
-      // expand back to per-league rows later without any data migration.
-      sql`
-        SELECT
-          'Sports' AS label,
-          COUNT(*)::int AS calls,
-          SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
-          SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
-          SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
-        FROM calls
-        WHERE NOT (COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES}))
       `,
       // Recent calls — hide Insider categories from the public stream.
       sql`
@@ -99,16 +84,27 @@ export default async function handler() {
     // The frontend decides display: "X%" for resolved >= 10, W-L record
     // for smaller samples, "—" for zero resolved. Keeping the raw rate in
     // the payload lets the dot-color and tooltip logic work consistently.
-    const categories = categoryRows.map(r => ({
-      label: r.label,
-      calls: r.calls,
-      wins: r.wins,
-      losses: r.losses,
-      resolved: r.resolved,
-      winRate: r.resolved > 0
-        ? Math.round((r.wins / r.resolved) * 1000) / 10
+    // Sports row derived from counter - Insider so the visible totals
+    // always reconcile with the headline. We don't count rows in the
+    // calls table directly because the counter accumulates outcomes
+    // across reversed/archived calls (it never decrements), and visitors
+    // expect "Sports + Others = headline total."
+    const insiderRow0 = insiderRows[0] || { wins: 0, losses: 0, calls: 0 };
+    const totalCalls   = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
+    const sportsCalls  = totalCalls           - (insiderRow0.calls  || 0);
+    const sportsWins   = (counter.wins   || 0) - (insiderRow0.wins   || 0);
+    const sportsLosses = (counter.losses || 0) - (insiderRow0.losses || 0);
+    const sportsResolved = sportsWins + sportsLosses;
+    const categories = [{
+      label: 'Sports',
+      calls: Math.max(0, sportsCalls),
+      wins: Math.max(0, sportsWins),
+      losses: Math.max(0, sportsLosses),
+      resolved: sportsResolved,
+      winRate: sportsResolved > 0
+        ? Math.round((sportsWins / sportsResolved) * 1000) / 10
         : null,
-    }));
+    }];
 
     // Insider bucket — driven by the INSIDER_CATEGORIES allowlist so the
     // composition is intentional and stable. Adding a new sport elsewhere
