@@ -28,60 +28,20 @@ export default async function handler() {
         FROM call_counter
         LIMIT 1
       `,
-      // Categories — classify each call into a canonical league using
-      // sport (when set) or market_question text. The brain's deriveSport
-      // regex is narrow, so most NBA/NFL/NHL/MLB games where the question
-      // names teams like "Bulls vs Heat" fall into the generic Sports
-      // umbrella. We re-classify at read time using a wider keyword set
-      // and surface every league as its own row.
-      // Insider categories (Politics, Crypto) are filtered out here and
-      // surfaced separately by the insiderRows query, displayed as "Others".
+      // Categories — beast mode: collapse everything that isn't an Insider
+      // category into a single 'Sports' bucket. No per-league classification
+      // (kept simple while regex coverage is incomplete and seasons rotate).
+      // Brain still stores per-league sport tags going forward, so we can
+      // expand back to per-league rows later without any data migration.
       sql`
-        WITH classified AS (
-          SELECT
-            CASE
-              WHEN COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES})
-                THEN COALESCE(sport, category)
-              WHEN sport = 'Combat' THEN 'UFC'
-              WHEN sport IN ('NBA','NFL','NHL','MLB','Soccer','Esports','Cricket','F1','Tennis','Golf')
-                THEN sport
-              WHEN market_question ~* '(\\mnba\\M|lakers|celtics|warriors|bulls|knicks|heat|nets|76ers|sixers|bucks|suns|mavericks|\\mmavs\\M|nuggets|spurs|rockets|thunder|jazz|trail blazers|blazers|clippers|pelicans|hawks|hornets|magic|pistons|pacers|cavaliers|cavs|wizards|raptors|grizzlies|timberwolves|basketball)'
-                THEN 'NBA'
-              WHEN market_question ~* '(\\mnfl\\M|patriots|cowboys|eagles|chiefs|bills|49ers|niners|ravens|steelers|packers|vikings|bears|\\mlions\\M|dolphins|bengals|browns|broncos|raiders|chargers|texans|colts|jaguars|titans|buccaneers|\\mbucs\\M|saints|falcons|seahawks|\\mrams\\M|commanders|washington commanders|super bowl|\\mafc\\M|\\mnfc\\M|nfl draft|jets vs|vs jets|giants vs|vs giants|panthers vs|vs panthers|cardinals vs|vs cardinals)'
-                THEN 'NFL'
-              WHEN market_question ~* '(\\mnhl\\M|hockey|penguins|bruins|maple leafs|canadiens|senators|sabres|devils|islanders|flyers|capitals|hurricanes|lightning|predators|stars|avalanche|\\mwild\\M|blackhawks|\\mblues\\M|coyotes|golden knights|kraken|oilers|canucks|flames|sharks|ducks|blue jackets|red wings|stanley cup)'
-                THEN 'NHL'
-              WHEN market_question ~* '(\\mmlb\\M|baseball|yankees|\\mdodgers\\M|red sox|\\mcubs\\M|\\mmets\\M|astros|braves|phillies|blue jays|world series|orioles|rays|guardians|marlins|nationals|brewers|cardinals|\\mreds\\M|royals|mariners|rockies|padres|pirates|diamondbacks|\\mtigers\\M|twins|athletics|angels)'
-                THEN 'MLB'
-              WHEN market_question ~* '(soccer|premier league|champions league|\\mucl\\M|\\muefa\\M|bundesliga|la liga|serie a|\\mmls\\M|\\mfifa\\M|world cup|liverpool|arsenal|chelsea|man city|man united|tottenham|\\mpsg\\M|bayern|real madrid|barcelona|juventus|\\mafcon\\M|copa america)'
-                THEN 'Soccer'
-              WHEN market_question ~* '(esports?|counter-?strike|\\mcs2\\M|valorant|league of legends|\\mdota\\M|\\miem\\M|\\mvct\\M|\\mlol\\M)'
-                THEN 'Esports'
-              WHEN market_question ~* '(cricket|\\mipl\\M|\\mt20\\M|\\modi\\M)'
-                THEN 'Cricket'
-              WHEN market_question ~* '(formula 1|formula one|\\mf1\\M|grand prix|drivers'' champion|constructors'' champion|verstappen|hamilton|leclerc|norris|piastri|russell)'
-                THEN 'F1'
-              WHEN market_question ~* '(\\matp\\M|\\mwta\\M|tennis|wimbledon|us open|french open|australian open|roland.garros|djokovic|alcaraz|sinner|swiatek|sabalenka|federer|nadal)'
-                THEN 'Tennis'
-              WHEN market_question ~* '(\\mpga\\M|\\mlpga\\M|masters tournament|\\mgolf\\M|tiger woods|mcilroy|scheffler|augusta|ryder cup|liv golf)'
-                THEN 'Golf'
-              WHEN market_question ~* '(\\mufc\\M|\\mmma\\M|boxing|jon jones|conor mcgregor|khabib|ngannou|usman|adesanya|fury|joshua|alvarez|canelo)'
-                THEN 'UFC'
-              ELSE 'Mixed'
-            END AS league,
-            outcome
-          FROM calls
-        )
         SELECT
-          league AS label,
+          'Sports' AS label,
           COUNT(*)::int AS calls,
           SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
           SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
-        FROM classified
-        WHERE NOT (league = ANY(${INSIDER_CATEGORIES}))
-        GROUP BY league
-        ORDER BY calls DESC
+        FROM calls
+        WHERE NOT (COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES}))
       `,
       // Recent calls — hide Insider categories from the public stream.
       sql`
