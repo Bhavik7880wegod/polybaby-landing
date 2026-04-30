@@ -122,24 +122,31 @@ export default async function handler() {
         };
       });
 
-    // Insider bucket — driven by the INSIDER_CATEGORIES allowlist so the
-    // composition is intentional and stable. Adding a new sport elsewhere
-    // never reshapes this. Win rate updates only as Insider categories'
-    // calls resolve.
-    const insiderRow = insiderRows[0] || {};
-    const insiderResolved = (insiderRow.wins || 0) + (insiderRow.losses || 0);
+    // "Others" bucket — derived as residual against the headline counter so
+    // that sum-of-leagues + Others = headline total exactly. Absorbs:
+    //   - Politics + Crypto (the original Insider allowlist)
+    //   - Archived rows (calls older than 7 days)
+    //   - Pre-Neon-migration calls (no per-call record exists in the DB)
+    // This trades label precision for math that reconciles cleanly with the
+    // marketing-friendly headline (294/467/63%). The label stays "Others"
+    // because the bucket's composition is now mixed by design.
+    const sumLeagueCalls   = categories.reduce((s, c) => s + (c.calls   || 0), 0);
+    const sumLeagueWins    = categories.reduce((s, c) => s + (c.wins    || 0), 0);
+    const sumLeagueLosses  = categories.reduce((s, c) => s + (c.losses  || 0), 0);
+    const headlineTotalCalls = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
+    const othersCalls   = Math.max(0, headlineTotalCalls       - sumLeagueCalls);
+    const othersWins    = Math.max(0, (counter.wins   || 0) - sumLeagueWins);
+    const othersLosses  = Math.max(0, (counter.losses || 0) - sumLeagueLosses);
+    const othersResolved = othersWins + othersLosses;
     const insider = {
       labels: INSIDER_CATEGORIES,
-      // displayLabel is what visitors see on the row. Decoupled from
-      // labels so we can rename ("Others") without touching the
-      // underlying data shape.
       displayLabel: 'Others',
-      calls: insiderRow.calls || 0,
-      wins: insiderRow.wins || 0,
-      losses: insiderRow.losses || 0,
-      resolved: insiderResolved,
-      winRate: insiderResolved > 0
-        ? Math.round((insiderRow.wins / insiderResolved) * 1000) / 10
+      calls: othersCalls,
+      wins: othersWins,
+      losses: othersLosses,
+      resolved: othersResolved,
+      winRate: othersResolved > 0
+        ? Math.round((othersWins / othersResolved) * 1000) / 10
         : null,
     };
     // Back-compat aliases — keep older client field names working.

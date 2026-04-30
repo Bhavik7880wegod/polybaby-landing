@@ -732,8 +732,7 @@
         || (Array.isArray(insider.labels) && insider.labels.length
             ? insider.labels.map(s => fmtTag(s)).join(' + ')
             : 'Others');
-      const insiderTitle = (insider.labels || []).join(' + ') +
-        ' signals reserved for the $500/mo Insider tier. Counts toward the headline total and accuracy.';
+      const insiderTitle = 'Politics, Crypto, and other markets outside the listed sport leagues. Counts toward the headline total and accuracy.';
       const tail = insiderCount > 0
         ? '<div class="cat-row cat-row-insider" title="' + esc(insiderTitle) + '" style="opacity:0.85">' +
             '<span class="cat-label">' + esc(insiderLabel) + '</span>' +
@@ -744,26 +743,6 @@
           '</div>'
         : '';
       catEl.innerHTML = rows + tail;
-
-      // Two-tier framing: per-league rows reflect "currently tracked" calls;
-      // the headline above is the brain's lifetime counter (which includes
-      // resolutions for calls predating the Neon migration). The footer
-      // makes that relationship explicit so visitors don't have to add up
-      // the rows and wonder why they don't equal the headline.
-      const footerEl = $('d-cat-footer');
-      if (footerEl) {
-        const trackedCalls = data.categories.reduce((s, c) => s + (c.calls || 0), 0)
-          + (insider.calls || 0);
-        const counter = data.counter || {};
-        const lifetimeCalls = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
-        const leagueCount = data.categories.filter(c => (c.calls || 0) > 0).length;
-        footerEl.innerHTML =
-          'Currently tracking <strong>' + trackedCalls + '</strong> calls across '
-          + leagueCount + ' ' + (leagueCount === 1 ? 'sport' : 'sports')
-          + (insider.calls > 0 ? ' + ' + esc(insider.displayLabel || 'Insider') : '')
-          + '. Headline reflects all-time record across <strong>' + lifetimeCalls
-          + '</strong> resolutions since launch.';
-      }
     }
 
     const callsEl = $('d-calls');
