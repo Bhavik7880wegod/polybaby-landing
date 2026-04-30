@@ -687,8 +687,8 @@
 
     const catEl = $('d-categories');
     if (catEl && Array.isArray(data.categories) && data.categories.length) {
-      const hidden = data.categoriesHidden || { count: Number(data.categoriesHiddenCount || 0), winRate: null };
-      const hiddenCount = Number(hidden.count || 0);
+      const insider = data.insider || { labels: [], calls: 0, winRate: null };
+      const insiderCount = Number(insider.calls || 0);
       const rows = data.categories.map(cat => {
         const rateText = cat.winRate != null ? cat.winRate.toFixed(0) + '%' : '—';
         return '<div class="cat-row">' +
@@ -699,17 +699,21 @@
           '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
         '</div>';
       }).join('');
-      const hiddenRate = hidden.winRate != null
-        ? Number(hidden.winRate).toFixed(0) + '%'
+      const insiderRate = insider.winRate != null
+        ? Number(insider.winRate).toFixed(0) + '%'
         : '—';
-      const hiddenTitle = 'Combined private + long-tail buckets — categories with under 3 calls and markets we don\'t surface individually. Counts toward the headline total and accuracy.';
-      const tail = hiddenCount > 0
-        ? '<div class="cat-row cat-row-hidden" title="' + esc(hiddenTitle) + '" style="opacity:0.7">' +
-            '<span class="cat-label">Other</span>' +
+      const insiderLabel = Array.isArray(insider.labels) && insider.labels.length
+        ? insider.labels.map(s => fmtTag(s)).join(' + ')
+        : 'Insider';
+      const insiderTitle = (insider.labels || []).join(' + ') +
+        ' signals reserved for the $500/mo Insider tier. Counts toward the headline total and accuracy.';
+      const tail = insiderCount > 0
+        ? '<div class="cat-row cat-row-insider" title="' + esc(insiderTitle) + '" style="opacity:0.85">' +
+            '<span class="cat-label">' + esc(insiderLabel) + '</span>' +
             '<span class="cat-bar"></span>' +
-            '<span class="cat-count">' + hiddenCount + ' ' + (hiddenCount === 1 ? 'call' : 'calls') + '</span>' +
-            '<span class="cat-rate">' + hiddenRate + '</span>' +
-            '<span class="cat-dot ' + dotClass(hidden.winRate) + '">●</span>' +
+            '<span class="cat-count">' + insiderCount + ' ' + (insiderCount === 1 ? 'call' : 'calls') + '</span>' +
+            '<span class="cat-rate">' + insiderRate + '</span>' +
+            '<span class="cat-dot ' + dotClass(insider.winRate) + '">●</span>' +
           '</div>'
         : '';
       catEl.innerHTML = rows + tail;

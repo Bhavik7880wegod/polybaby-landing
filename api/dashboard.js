@@ -4,15 +4,22 @@ export const config = { runtime: 'edge' };
 
 const sql = neon(process.env.DATABASE_URL);
 
-// Politics is the only category hidden from public dashboard surface.
-// Politics calls are still written to Neon by the brain — we just don't
-// surface them in the visible UI. They DO factor into the aggregate
-// counter and the cumulative P&L chart so headline numbers stay honest.
-const HIDE_LABELS = ['Politics'];
+// INSIDER_CATEGORIES is the allowlist of categories surfaced together
+// as the "Insider only" / paid-tier bucket on the public dashboard.
+// Categories listed here are excluded from the visible top-12 and
+// aggregated into the Insider row instead. Their stats still count
+// toward the headline counter and the cumulative P&L chart so the
+// headline numbers stay honest.
+//
+// To add a category (e.g., a future "TechEarnings" premium bucket),
+// append the label here and redeploy — the dashboard label, stats,
+// and tooltip auto-update.
+const INSIDER_CATEGORIES = ['Politics', 'Crypto'];
+const HIDE_LABELS = INSIDER_CATEGORIES;
 
 export default async function handler() {
   try {
-    const [counterRows, categoryRows, recentRows, pnlRows] = await Promise.all([
+    const [counterRows, categoryRows, recentRows, pnlRows, insiderRows] = await Promise.all([
       // Counter — global totals across ALL categories (politics included)
       sql`
         SELECT next_id, wins, losses, pending,
@@ -21,7 +28,8 @@ export default async function handler() {
         FROM call_counter
         LIMIT 1
       `,
-      // Categories — hide Politics only; everything else shows
+      // Categories — exclude Insider categories so the visible top-12
+      // never includes Politics or Crypto (those join the Insider row).
       sql`
         SELECT
           COALESCE(sport, category) AS label,
@@ -32,13 +40,13 @@ export default async function handler() {
         FROM calls
         WHERE COALESCE(sport, category) IS NOT NULL
           AND COALESCE(sport, category) <> 'Other'
-          AND COALESCE(sport, category) <> 'Politics'
+          AND NOT (COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES}))
         GROUP BY label
         HAVING COUNT(*) >= 3
         ORDER BY calls DESC
         LIMIT 12
       `,
-      // Recent calls — hide Politics
+      // Recent calls — hide Insider categories from the public stream.
       sql`
         SELECT
           call_number, market_question, market_url,
@@ -48,11 +56,12 @@ export default async function handler() {
           outcome, timestamp, updated_at
         FROM calls
         WHERE (archived = FALSE OR archived IS NULL)
-          AND (category IS NULL OR category <> 'Politics')
+          AND (category IS NULL OR NOT (category = ANY(${INSIDER_CATEGORIES})))
+          AND (sport    IS NULL OR NOT (sport    = ANY(${INSIDER_CATEGORIES})))
         ORDER BY call_number DESC
         LIMIT 20
       `,
-      // P&L series — include ALL resolved calls (politics included)
+      // P&L series — include ALL resolved calls (Insider included)
       // so the cumulative chart matches the headline counter.
       sql`
         SELECT
@@ -66,6 +75,18 @@ export default async function handler() {
         FROM calls
         WHERE outcome IN ('WIN', 'LOSS')
         ORDER BY timestamp ASC
+      `,
+      // Insider aggregate — explicit allowlist (NOT residual), so this
+      // bucket's composition is locked to INSIDER_CATEGORIES. Adding a new
+      // sport / market type elsewhere never accidentally affects this row.
+      sql`
+        SELECT
+          COUNT(*)::int AS calls,
+          SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
+          SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
+          SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
+        FROM calls
+        WHERE COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES})
       `,
     ]);
 
@@ -86,29 +107,31 @@ export default async function handler() {
       winRate: r.resolved > 0 ? Math.round((r.wins / r.resolved) * 1000) / 10 : null,
     }));
 
-    // Reconcile the categories panel against the headline counter so
-    // visitors don't see "215 visible vs 463 total" and assume broken math.
-    // Politics + Other + small/long-tail categories are deliberately hidden;
-    // surface the delta as a single muted "+ N other" row, with the actual
-    // blended win rate of the hidden bucket so the math fully reconciles.
-    const totalCallsAcrossAll = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
-    const visibleCallsSum = categories.reduce((a, c) => a + c.calls, 0);
-    const visibleWinsSum   = categories.reduce((a, c) => a + (c.wins || 0), 0);
-    const visibleLossesSum = categories.reduce((a, c) => a + (c.losses || 0), 0);
-    const hiddenWins   = Math.max(0, (counter.wins   || 0) - visibleWinsSum);
-    const hiddenLosses = Math.max(0, (counter.losses || 0) - visibleLossesSum);
-    const hiddenResolved = hiddenWins + hiddenLosses;
-    const categoriesHidden = {
-      count: Math.max(0, totalCallsAcrossAll - visibleCallsSum),
-      wins: hiddenWins,
-      losses: hiddenLosses,
-      resolved: hiddenResolved,
-      winRate: hiddenResolved > 0
-        ? Math.round((hiddenWins / hiddenResolved) * 1000) / 10
+    // Insider bucket — driven by the INSIDER_CATEGORIES allowlist so the
+    // composition is intentional and stable. Adding a new sport elsewhere
+    // never reshapes this. Win rate updates only as Insider categories'
+    // calls resolve.
+    const insiderRow = insiderRows[0] || {};
+    const insiderResolved = (insiderRow.wins || 0) + (insiderRow.losses || 0);
+    const insider = {
+      labels: INSIDER_CATEGORIES,
+      calls: insiderRow.calls || 0,
+      wins: insiderRow.wins || 0,
+      losses: insiderRow.losses || 0,
+      resolved: insiderResolved,
+      winRate: insiderResolved > 0
+        ? Math.round((insiderRow.wins / insiderResolved) * 1000) / 10
         : null,
     };
-    // Back-compat: keep the old top-level field so existing clients don't break.
-    const categoriesHiddenCount = categoriesHidden.count;
+    // Back-compat aliases — keep older client field names working.
+    const categoriesHiddenCount = insider.calls;
+    const categoriesHidden = {
+      count: insider.calls,
+      wins: insider.wins,
+      losses: insider.losses,
+      resolved: insider.resolved,
+      winRate: insider.winRate,
+    };
 
     const recentCalls = recentRows.map(r => ({
       callNumber: r.call_number,
@@ -149,6 +172,7 @@ export default async function handler() {
         accuracy: counter.accuracy != null ? counter.accuracy.toFixed(1) : '0.0',
       },
       categories,
+      insider,
       categoriesHiddenCount,
       categoriesHidden,
       recentCalls,
