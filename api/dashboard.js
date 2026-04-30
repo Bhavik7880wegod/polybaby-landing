@@ -30,33 +30,44 @@ export default async function handler() {
       `,
       // Categories — classify each call into a canonical league using
       // sport (when set) or market_question text. The brain's deriveSport
-      // regex is narrow (only catches a few team names), so most NBA/NFL/
-      // NHL/MLB games where the question says "Bulls vs Heat" or "Bruins
-      // vs Sabres" fall into a generic Sports umbrella. We re-classify at
-      // read time using a wider keyword set so the public dashboard shows
-      // real per-league counts.
-      // Categories excluded here (Politics, Crypto) join the Insider row.
+      // regex is narrow, so most NBA/NFL/NHL/MLB games where the question
+      // names teams like "Bulls vs Heat" fall into the generic Sports
+      // umbrella. We re-classify at read time using a wider keyword set
+      // and surface every league as its own row.
+      // Insider categories (Politics, Crypto) are filtered out here and
+      // surfaced separately by the insiderRows query, displayed as "Others".
       sql`
         WITH classified AS (
           SELECT
             CASE
               WHEN COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES})
                 THEN COALESCE(sport, category)
-              WHEN sport IN ('NBA','NFL','NHL','Soccer','Esports','Cricket')
+              WHEN sport = 'Combat' THEN 'UFC'
+              WHEN sport IN ('NBA','NFL','NHL','MLB','Soccer','Esports','Cricket','F1','Tennis','Golf')
                 THEN sport
               WHEN market_question ~* '(\\mnba\\M|lakers|celtics|warriors|bulls|knicks|heat|nets|76ers|sixers|bucks|suns|mavericks|\\mmavs\\M|nuggets|spurs|rockets|thunder|jazz|trail blazers|blazers|clippers|pelicans|hawks|hornets|magic|pistons|pacers|cavaliers|cavs|wizards|raptors|grizzlies|timberwolves|basketball)'
                 THEN 'NBA'
-              WHEN market_question ~* '(\\mnfl\\M|patriots|cowboys|eagles|chiefs|bills|49ers|niners|ravens|steelers|packers|vikings|bears|lions|dolphins|bengals|browns|broncos|raiders|chargers|texans|colts|jaguars|titans|buccaneers|saints|falcons|seahawks|rams|commanders|super bowl)'
+              WHEN market_question ~* '(\\mnfl\\M|patriots|cowboys|eagles|chiefs|bills|49ers|niners|ravens|steelers|packers|vikings|bears|lions|dolphins|bengals|browns|broncos|raiders|chargers|texans|colts|jaguars|titans|buccaneers|saints|falcons|seahawks|rams|commanders|super bowl|\\mafc\\M|\\mnfc\\M)'
                 THEN 'NFL'
-              WHEN market_question ~* '(\\mnhl\\M|hockey|penguins|bruins|maple leafs|canadiens|senators|sabres|devils|islanders|flyers|capitals|hurricanes|lightning|predators|stars|avalanche|\\mwild\\M|blackhawks|blues|coyotes|golden knights|kraken|oilers|canucks|flames|sharks|ducks|blue jackets|red wings|stanley cup)'
+              WHEN market_question ~* '(\\mnhl\\M|hockey|penguins|bruins|maple leafs|canadiens|senators|sabres|devils|islanders|flyers|capitals|hurricanes|lightning|predators|stars|avalanche|\\mwild\\M|blackhawks|\\mblues\\M|coyotes|golden knights|kraken|oilers|canucks|flames|sharks|ducks|blue jackets|red wings|stanley cup)'
                 THEN 'NHL'
-              WHEN market_question ~* '(soccer|premier league|champions league|\\mucl\\M|\\muefa\\M|bundesliga|la liga|serie a|\\mmls\\M|\\mfifa\\M|world cup|liverpool|arsenal|chelsea|man city|man united|tottenham|\\mpsg\\M|bayern|real madrid|barcelona|juventus)'
+              WHEN market_question ~* '(\\mmlb\\M|baseball|yankees|\\mdodgers\\M|red sox|\\mcubs\\M|\\mmets\\M|astros|braves|phillies|blue jays|world series|orioles|rays|guardians|marlins|nationals|brewers|cardinals|\\mreds\\M|royals|mariners|rockies|padres|pirates|diamondbacks|\\mtigers\\M|twins|athletics|angels)'
+                THEN 'MLB'
+              WHEN market_question ~* '(soccer|premier league|champions league|\\mucl\\M|\\muefa\\M|bundesliga|la liga|serie a|\\mmls\\M|\\mfifa\\M|world cup|liverpool|arsenal|chelsea|man city|man united|tottenham|\\mpsg\\M|bayern|real madrid|barcelona|juventus|\\mafcon\\M|copa america)'
                 THEN 'Soccer'
-              WHEN market_question ~* '(esports?|counter-?strike|\\mcs2\\M|valorant|league of legends|\\mdota\\M|\\miem\\M|\\mvct\\M)'
+              WHEN market_question ~* '(esports?|counter-?strike|\\mcs2\\M|valorant|league of legends|\\mdota\\M|\\miem\\M|\\mvct\\M|\\mlol\\M)'
                 THEN 'Esports'
               WHEN market_question ~* '(cricket|\\mipl\\M|\\mt20\\M|\\modi\\M)'
                 THEN 'Cricket'
-              ELSE 'Others'
+              WHEN market_question ~* '(formula 1|formula one|\\mf1\\M|grand prix|drivers'' champion|constructors'' champion|verstappen|hamilton|leclerc|norris|piastri|russell)'
+                THEN 'F1'
+              WHEN market_question ~* '(\\matp\\M|\\mwta\\M|tennis|wimbledon|us open|french open|australian open|roland.garros|djokovic|alcaraz|sinner|swiatek|sabalenka|federer|nadal)'
+                THEN 'Tennis'
+              WHEN market_question ~* '(\\mpga\\M|\\mlpga\\M|masters tournament|\\mgolf\\M|tiger woods|mcilroy|scheffler|augusta|ryder cup|liv golf)'
+                THEN 'Golf'
+              WHEN market_question ~* '(\\mufc\\M|\\mmma\\M|boxing|jon jones|conor mcgregor|khabib|ngannou|usman|adesanya|fury|joshua|alvarez|canelo)'
+                THEN 'UFC'
+              ELSE 'Misc'
             END AS league,
             outcome
           FROM calls
@@ -69,6 +80,7 @@ export default async function handler() {
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
         FROM classified
         WHERE NOT (league = ANY(${INSIDER_CATEGORIES}))
+          AND league <> 'Misc'
         GROUP BY league
         ORDER BY calls DESC
       `,
@@ -147,6 +159,10 @@ export default async function handler() {
     const insiderResolved = (insiderRow.wins || 0) + (insiderRow.losses || 0);
     const insider = {
       labels: INSIDER_CATEGORIES,
+      // displayLabel is what visitors see on the row. Decoupled from
+      // labels so we can rename ("Others") without touching the
+      // underlying data shape.
+      displayLabel: 'Others',
       calls: insiderRow.calls || 0,
       wins: insiderRow.wins || 0,
       losses: insiderRow.losses || 0,

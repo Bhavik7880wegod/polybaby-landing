@@ -711,12 +711,16 @@
             '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
           '</div>';
         }).join('');
-      const insiderRate = insider.winRate != null
+      const insiderResolved = Number(insider.resolved || 0);
+      const insiderRate = insiderResolved >= 10 && insider.winRate != null
         ? Number(insider.winRate).toFixed(0) + '%'
-        : '—';
-      const insiderLabel = Array.isArray(insider.labels) && insider.labels.length
-        ? insider.labels.map(s => fmtTag(s)).join(' + ')
-        : 'Insider';
+        : insiderResolved > 0
+          ? (insider.wins || 0) + '-' + (insider.losses || 0)
+          : '—';
+      const insiderLabel = insider.displayLabel
+        || (Array.isArray(insider.labels) && insider.labels.length
+            ? insider.labels.map(s => fmtTag(s)).join(' + ')
+            : 'Others');
       const insiderTitle = (insider.labels || []).join(' + ') +
         ' signals reserved for the $500/mo Insider tier. Counts toward the headline total and accuracy.';
       const tail = insiderCount > 0
