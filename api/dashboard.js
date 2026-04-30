@@ -42,7 +42,7 @@ export default async function handler() {
           AND COALESCE(sport, category) <> 'Other'
           AND NOT (COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES}))
         GROUP BY label
-        HAVING COUNT(*) >= 3
+        HAVING COUNT(*) >= 5
         ORDER BY calls DESC
         LIMIT 12
       `,
@@ -98,13 +98,20 @@ export default async function handler() {
       );
     }
 
+    // Win-rate sample-size floor — never claim a rate on tiny denominators.
+    // Below this threshold, winRate stays null and the UI shows "—" so a
+    // category with a 7-0 record reads as "we don't have enough data yet"
+    // rather than a misleading 100%.
+    const RATE_MIN_RESOLVED = 10;
     const categories = categoryRows.map(r => ({
       label: r.label,
       calls: r.calls,
       wins: r.wins,
       losses: r.losses,
       resolved: r.resolved,
-      winRate: r.resolved > 0 ? Math.round((r.wins / r.resolved) * 1000) / 10 : null,
+      winRate: r.resolved >= RATE_MIN_RESOLVED
+        ? Math.round((r.wins / r.resolved) * 1000) / 10
+        : null,
     }));
 
     // Insider bucket — driven by the INSIDER_CATEGORIES allowlist so the
