@@ -19,7 +19,7 @@ const HIDE_LABELS = INSIDER_CATEGORIES;
 
 export default async function handler() {
   try {
-    const [counterRows, recentRows, pnlRows, insiderRows] = await Promise.all([
+    const [counterRows, recentRows, pnlRows, insiderRows, leagueRows] = await Promise.all([
       // Counter — global totals across ALL categories (politics included)
       sql`
         SELECT next_id, wins, losses, pending,
@@ -70,6 +70,24 @@ export default async function handler() {
         FROM calls
         WHERE COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES})
       `,
+      // Per-league breakdown — every non-Insider call grouped by sport.
+      // Headline counter and per-league rows can differ (counter accumulates
+      // reversed/archived; rows show current state). Tooltip on the panel
+      // explains the gap.
+      sql`
+        SELECT
+          COALESCE(sport, 'OtherSports') AS sport,
+          COUNT(*)::int AS calls,
+          SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
+          SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
+          SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
+        FROM calls
+        WHERE (archived = FALSE OR archived IS NULL)
+          AND (category IS NULL OR NOT (category = ANY(${INSIDER_CATEGORIES})))
+          AND (sport    IS NULL OR NOT (sport    = ANY(${INSIDER_CATEGORIES})))
+        GROUP BY COALESCE(sport, 'OtherSports')
+        ORDER BY calls DESC
+      `,
     ]);
 
     const counter = counterRows[0];
@@ -80,31 +98,29 @@ export default async function handler() {
       );
     }
 
-    // Always compute winRate when there's at least one resolved call.
-    // The frontend decides display: "X%" for resolved >= 10, W-L record
-    // for smaller samples, "—" for zero resolved. Keeping the raw rate in
-    // the payload lets the dot-color and tooltip logic work consistently.
-    // Sports row derived from counter - Insider so the visible totals
-    // always reconcile with the headline. We don't count rows in the
-    // calls table directly because the counter accumulates outcomes
-    // across reversed/archived calls (it never decrements), and visitors
-    // expect "Sports + Others = headline total."
-    const insiderRow0 = insiderRows[0] || { wins: 0, losses: 0, calls: 0 };
-    const totalCalls   = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
-    const sportsCalls  = totalCalls           - (insiderRow0.calls  || 0);
-    const sportsWins   = (counter.wins   || 0) - (insiderRow0.wins   || 0);
-    const sportsLosses = (counter.losses || 0) - (insiderRow0.losses || 0);
-    const sportsResolved = sportsWins + sportsLosses;
-    const categories = [{
-      label: 'Sports',
-      calls: Math.max(0, sportsCalls),
-      wins: Math.max(0, sportsWins),
-      losses: Math.max(0, sportsLosses),
-      resolved: sportsResolved,
-      winRate: sportsResolved > 0
-        ? Math.round((sportsWins / sportsResolved) * 1000) / 10
-        : null,
-    }];
+    // Per-league rows — every non-Insider call grouped by canonical league.
+    // Sport labels are written by brain's deriveSport() (see
+    // polymarket-discord-monitor/src/brain/db-mirror.ts) using Polymarket
+    // tags, so they're already canonical (NBA, NFL, Soccer, Esports, etc.).
+    // We filter out leagues with 0 calls so off-season sports don't render
+    // as empty rows. Headline / per-league sum gap is explained via tooltip.
+    const categories = (leagueRows || [])
+      .filter(r => Number(r.calls || 0) > 0)
+      .map(r => {
+        const wins = Number(r.wins || 0);
+        const losses = Number(r.losses || 0);
+        const resolved = Number(r.resolved || 0);
+        return {
+          label: r.sport,
+          calls: Number(r.calls || 0),
+          wins,
+          losses,
+          resolved,
+          winRate: resolved > 0
+            ? Math.round((wins / resolved) * 1000) / 10
+            : null,
+        };
+      });
 
     // Insider bucket — driven by the INSIDER_CATEGORIES allowlist so the
     // composition is intentional and stable. Adding a new sport elsewhere
