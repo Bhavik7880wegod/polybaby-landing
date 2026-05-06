@@ -38,7 +38,7 @@
       "url": "https://polybabyalerts.com/",
       "logo": "https://polybabyalerts.com/api/og",
       "sameAs": [
-        "https://discord.gg/Ba6ZgHANKK"
+        "https://discord.gg/wFR38QJq"
       ]
     },
     {
@@ -525,7 +525,7 @@
           <span>Lifetime Access</span>
           <span class="badge">Coming Soon</span>
         </a>
-        <a class="cta" href="https://discord.gg/Ba6ZgHANKK">Join Discord →</a>
+        <a class="cta" href="https://discord.gg/wFR38QJq">Join Discord →</a>
       </div>
     </div>
   </div>
@@ -573,7 +573,7 @@
         </div>
       </div>
       <div class="calls-cta">
-        <a href="https://discord.gg/Ba6ZgHANKK">See live calls in Discord →</a>
+        <a href="https://discord.gg/wFR38QJq">See live calls in Discord →</a>
       </div>
     </div>
 
@@ -642,7 +642,7 @@
   <p>
     Every PolyBaby call is logged with the exact Polymarket URL, entry price, side, and timestamp
     before the event resolves. The cumulative track record is shown live in the dashboard above:
-    <strong>294 wins / 173 losses / 63% accuracy across 487 calls</strong>. Every win is independently
+    <strong><span id="track-wins">—</span> wins / <span id="track-losses">—</span> losses / <span id="track-accuracy">—</span>% accuracy across <span id="track-total">—</span> calls</strong>. Every win is independently
     verifiable on Polymarket itself — no deletion, no curated highlight reels.
   </p>
 
@@ -660,7 +660,7 @@
   <div>
     <a href="mailto:polybabyalerts@gmail.com">Contact</a>
     <a href="privacy.html">Privacy</a>
-    <a href="https://discord.gg/Ba6ZgHANKK">Discord</a>
+    <a href="https://discord.gg/wFR38QJq">Discord</a>
   </div>
 </div>
 
@@ -718,6 +718,13 @@
       if (liveEl && s.wins != null && s.total != null && s.accuracy != null) {
         liveEl.innerHTML = '<span class="live-dot"></span>' + s.wins + ' / ' + s.total + ' · ' + s.accuracy + '%';
       }
+      // Bottom "Verifiable track record" paragraph — wire to live counter
+      const setText = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.textContent = val; };
+      const totalCalls = (Number(s.wins) || 0) + (Number(s.losses) || 0) + (Number(s.pending) || 0);
+      setText('track-wins', s.wins);
+      setText('track-losses', s.losses);
+      setText('track-accuracy', s.accuracy);
+      setText('track-total', totalCalls || null);
     })
     .catch(() => {/* silent — keeps hardcoded fallback */});
 
@@ -867,7 +874,7 @@
         const returnText = isWin ? '+' + call.returnPct + '%'
           : call.outcome === 'LOSS' ? '—'
           : (call.returnPct != null ? '+' + call.returnPct + '% if W' : '—');
-        const url = esc(call.marketUrl || 'https://discord.gg/Ba6ZgHANKK');
+        const url = esc(call.marketUrl || 'https://discord.gg/wFR38QJq');
         const conf = esc(call.confidence || '—').replace(/—\s*single-trader.*/i, 'LOW');
         return '<a class="call-card" href="' + url + '" target="_blank" rel="noopener noreferrer">' +
           '<div class="cc-top">' +
