@@ -259,26 +259,7 @@
     .footer-strip > div{width:100%}
   }
 
-  /* Jump-to-dashboard link — gradient text + glow */
-  .footer-strip.footer-jump{
-    justify-content:center;text-decoration:none;cursor:pointer;
-    margin-top:24px;
-    border-top:1px solid rgba(236,72,153,0.28);
-    background:linear-gradient(90deg,#EC4899 0%,#FF9C7A 50%,#FFD43B 100%);
-    -webkit-background-clip:text;background-clip:text;
-    -webkit-text-fill-color:transparent;color:transparent;
-    font-weight:800;font-size:13px;letter-spacing:3.5px;
-    filter:drop-shadow(0 0 14px rgba(236,72,153,0.4));
-    transition:filter 0.2s,letter-spacing 0.2s,border-top-color 0.2s;
-  }
-  .footer-strip.footer-jump:hover{
-    filter:drop-shadow(0 0 26px rgba(236,72,153,0.75));
-    letter-spacing:4.5px;border-top-color:rgba(255,212,59,0.6);
-  }
-  .footer-strip.footer-jump .arrow{
-    display:inline-block;margin-left:8px;
-    animation:jumpBounce 2s ease-in-out infinite;
-  }
+  /* Bouncing-arrow keyframe shared by .track-record-pill .arrow */
   @keyframes jumpBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
 
   /* Bottom footer (after dashboard, outside .page so needs its own horizontal padding) */
@@ -571,10 +552,6 @@
       </div>
     </div>
   </div>
-
-  <a href="#dashboard" class="footer-strip footer-jump">
-    <span>Jump to Dashboard <span class="arrow">↓</span></span>
-  </a>
 
 </div>
 
