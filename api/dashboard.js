@@ -71,9 +71,8 @@ export default async function handler() {
         WHERE COALESCE(sport, category) = ANY(${INSIDER_CATEGORIES})
       `,
       // Per-league breakdown — every non-Insider call grouped by sport.
-      // Headline counter and per-league rows can differ (counter accumulates
-      // reversed/archived; rows show current state). Tooltip on the panel
-      // explains the gap.
+      // Includes archived rows so each league shows its full lifetime record
+      // (otherwise older wins like Cricket #457 hide in the Others residual).
       sql`
         SELECT
           COALESCE(sport, 'OtherSports') AS sport,
@@ -82,8 +81,7 @@ export default async function handler() {
           SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
         FROM calls
-        WHERE (archived = FALSE OR archived IS NULL)
-          AND (category IS NULL OR NOT (category = ANY(${INSIDER_CATEGORIES})))
+        WHERE (category IS NULL OR NOT (category = ANY(${INSIDER_CATEGORIES})))
           AND (sport    IS NULL OR NOT (sport    = ANY(${INSIDER_CATEGORIES})))
         GROUP BY COALESCE(sport, 'OtherSports')
         ORDER BY calls DESC
@@ -125,11 +123,8 @@ export default async function handler() {
     // "Others" bucket — derived as residual against the headline counter so
     // that sum-of-leagues + Others = headline total exactly. Absorbs:
     //   - Politics + Crypto (the original Insider allowlist)
-    //   - Archived rows (calls older than 7 days)
     //   - Pre-Neon-migration calls (no per-call record exists in the DB)
-    // This trades label precision for math that reconciles cleanly with the
-    // marketing-friendly headline (294/467/63%). The label stays "Others"
-    // because the bucket's composition is now mixed by design.
+    // The label stays "Others" because the bucket's composition is mixed.
     const sumLeagueCalls   = categories.reduce((s, c) => s + (c.calls   || 0), 0);
     const sumLeagueWins    = categories.reduce((s, c) => s + (c.wins    || 0), 0);
     const sumLeagueLosses  = categories.reduce((s, c) => s + (c.losses  || 0), 0);
