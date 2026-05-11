@@ -847,13 +847,11 @@
       const insider = data.insider || { labels: [], calls: 0, winRate: null };
       const insiderCount = Number(insider.calls || 0);
       // Display rule for the rate column:
-      //   resolved >= 10  → show "X%" (statistically meaningful)
-      //   resolved 1-9    → show "W-L" record (small sample, raw is honest)
-      //   resolved == 0   → show "—" (all pending)
+      //   resolved >= 1  → show "X%" (uniform across all leagues)
+      //   resolved == 0  → show "—" (all pending)
       const rateForCat = (cat) => {
         const resolved = Number(cat.resolved || 0);
-        if (resolved >= 10 && cat.winRate != null) return cat.winRate.toFixed(0) + '%';
-        if (resolved > 0) return (cat.wins || 0) + '-' + (cat.losses || 0);
+        if (resolved > 0 && cat.winRate != null) return cat.winRate.toFixed(0) + '%';
         return '—';
       };
       const rows = data.categories
