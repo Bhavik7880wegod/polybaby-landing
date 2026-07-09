@@ -38,7 +38,7 @@
       "url": "https://polybabyalerts.com/",
       "logo": "https://polybabyalerts.com/api/og",
       "sameAs": [
-        "https://discord.gg/ymgtvD2Zj5"
+        "https://discord.gg/SYU2AbxWzP"
       ]
     },
     {
@@ -78,7 +78,7 @@
           "name": "How do I follow top Polymarket traders?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "PolyBaby tracks the top 50 Polymarket traders by lifetime PnL and posts an alert in Discord whenever one of them takes a position. Traders can join free at discord.gg/ymgtvD2Zj5 to get real-time pings, smart-money divergence signals, and 30-minute pre-game sports picks across all major leagues."
+            "text": "PolyBaby tracks the top 50 Polymarket traders by lifetime PnL and posts an alert in Discord whenever one of them takes a position. Traders can join free at discord.gg/SYU2AbxWzP to get real-time pings, smart-money divergence signals, and 30-minute pre-game sports picks across all major leagues."
           }
         },
         {
@@ -337,6 +337,304 @@
      taller recent-calls column instead of floating at the top. */
   #dashboard .d-grid > .panel:first-child{align-self:center}
   @media (max-width:1100px){#dashboard .d-grid{grid-template-columns:1fr}}
+  /* ═══════════ "How We Do It" section ═══════════ */
+  .how-section{
+    position:relative;background:#000;padding:120px 48px 100px;
+    overflow:hidden;color:#F4F6FA;border-top:1px solid rgba(255,255,255,0.04);
+  }
+  .how-section::before,.how-section::after{
+    content:'';position:absolute;width:560px;height:560px;border-radius:50%;
+    filter:blur(120px);pointer-events:none;z-index:0;
+  }
+  .how-section::before{
+    background:radial-gradient(circle,rgba(236,72,153,0.16) 0%,transparent 70%);
+    top:-100px;right:-120px;animation:drift1 90s ease-in-out infinite;
+  }
+  .how-section::after{
+    background:radial-gradient(circle,rgba(255,184,94,0.11) 0%,transparent 70%);
+    bottom:-150px;left:-120px;animation:drift2 110s ease-in-out infinite;
+  }
+  .how-section > *{position:relative;z-index:1}
+  .how-inner{max-width:1280px;margin:0 auto}
+
+  .how-eyebrow{
+    font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#888;
+    font-weight:600;margin-bottom:32px;display:flex;align-items:center;gap:14px;
+  }
+  .how-eyebrow::before{content:'';width:36px;height:1px;background:#444}
+
+  .how-quote{
+    font-family:'Modak','Bagel Fat One',cursive;font-weight:400;
+    font-size:clamp(44px,8.5vw,128px);line-height:0.95;letter-spacing:-0.02em;
+    background:linear-gradient(90deg,#FF3D8C 0%,#FF6FA0 22%,#FF9C7A 50%,#FFB85E 75%,#FFD43B 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 30px rgba(236,72,153,0.20)) drop-shadow(0 0 60px rgba(255,212,59,0.10));
+    margin-bottom:36px;max-width:1100px;
+  }
+  .how-sub{
+    font-size:clamp(16px,1.4vw,20px);color:#aaa;max-width:680px;
+    line-height:1.55;margin-bottom:80px;
+  }
+  .how-sub strong{color:#fff;font-weight:600}
+
+  .how-steps{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+  }
+  .how-step{
+    position:relative;background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;padding:32px 28px 36px;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    transition:transform .3s ease,border-color .3s ease,background .3s ease;
+  }
+  .how-step:hover{
+    transform:translateY(-4px);
+    border-color:rgba(236,72,153,0.42);
+    background:rgba(255,255,255,0.05);
+  }
+  .how-step .num{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:11px;color:#666;letter-spacing:2px;margin-bottom:20px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .how-step .num::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}
+  .how-step .step-dot{
+    width:8px;height:8px;border-radius:50%;background:#EC4899;
+    box-shadow:0 0 12px rgba(236,72,153,0.65);
+    animation:pulse-live 2.4s ease-in-out infinite;
+  }
+  .how-step h3{
+    font-size:30px;font-weight:800;letter-spacing:-1.2px;
+    margin-bottom:18px;color:#fff;text-transform:uppercase;line-height:1.05;
+  }
+  .how-step p{font-size:14.5px;line-height:1.65;color:#aaa}
+  .how-step p strong{color:#fff;font-weight:600}
+
+  .how-step.featured{
+    background:linear-gradient(135deg,rgba(236,72,153,0.08) 0%,rgba(255,184,94,0.04) 100%);
+    border-color:rgba(236,72,153,0.32);
+  }
+  .how-step.featured:hover{border-color:rgba(236,72,153,0.6)}
+  .how-step.featured h3{
+    background:linear-gradient(90deg,#FF3D8C 0%,#FF9C7A 60%,#FFB85E 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-text-fill-color:transparent;
+  }
+  .how-step.featured .step-dot{background:#FFD43B;box-shadow:0 0 14px rgba(255,212,59,0.7)}
+
+  .how-footer{
+    margin-top:72px;padding-top:36px;border-top:1px solid rgba(255,255,255,0.08);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;
+  }
+  .how-footer .proof{font-size:14px;color:#aaa;line-height:1.65;max-width:600px}
+  .how-footer .proof strong{color:#fff;font-weight:600}
+  .how-cta{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:12px;letter-spacing:2.5px;text-transform:uppercase;
+    color:#fff;text-decoration:none;font-weight:700;
+    background:rgba(236,72,153,0.06);
+    border:1px solid rgba(236,72,153,0.4);padding:16px 28px;border-radius:999px;
+    transition:all .25s;
+  }
+  .how-cta:hover{
+    background:rgba(236,72,153,0.14);
+    border-color:rgba(255,212,59,0.55);
+    transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(236,72,153,0.28);
+  }
+
+  @media (max-width:1024px){
+    .how-steps{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:640px){
+    .how-section{padding:72px 24px 64px}
+    .how-steps{grid-template-columns:1fr}
+    .how-quote{font-size:13.5vw}
+    .how-sub{margin-bottom:48px}
+    .how-footer{flex-direction:column;align-items:flex-start}
+    .how-cta{width:100%;justify-content:center}
+  }
+
+  /* Tab pill near hero — small "How we do it" link beneath the track-record pill */
+  .how-tab{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:10px 22px;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:999px;
+    text-decoration:none;
+    font-size:11px;font-weight:700;letter-spacing:2.5px;
+    text-transform:uppercase;color:rgba(255,255,255,0.85);
+    transition:transform .25s,border-color .25s,color .25s,background .25s;
+    cursor:pointer;
+  }
+  .how-tab:hover{
+    color:#fff;
+    background:rgba(255,255,255,0.05);
+    border-color:rgba(255,212,59,0.55);
+    transform:translateY(-2px);
+  }
+  .how-tab .how-tab-arrow{color:#FFD43B;font-size:12px;font-weight:800}
+  @media (max-width:768px){.how-tab{font-size:10px;letter-spacing:2px}}
+
+  /* ═══════════ Pricing section ═══════════ */
+  .pricing-section{
+    position:relative;background:#000;padding:96px 48px 110px;
+    overflow:hidden;color:#F4F6FA;border-top:1px solid rgba(255,255,255,0.04);
+  }
+  .pricing-section::before,.pricing-section::after{
+    content:'';position:absolute;width:540px;height:540px;border-radius:50%;
+    filter:blur(120px);pointer-events:none;z-index:0;
+  }
+  .pricing-section::before{
+    background:radial-gradient(circle,rgba(255,156,122,0.14) 0%,transparent 70%);
+    top:-80px;left:-100px;animation:drift2 100s ease-in-out infinite;
+  }
+  .pricing-section::after{
+    background:radial-gradient(circle,rgba(236,72,153,0.13) 0%,transparent 70%);
+    bottom:-120px;right:-100px;animation:drift1 95s ease-in-out infinite;
+  }
+  .pricing-section > *{position:relative;z-index:1}
+  .pricing-inner{max-width:1200px;margin:0 auto}
+
+  .pricing-eyebrow{
+    font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#888;
+    font-weight:600;margin-bottom:28px;display:flex;align-items:center;gap:14px;
+  }
+  .pricing-eyebrow::before{content:'';width:36px;height:1px;background:#444}
+
+  .pricing-quote{
+    font-family:'Modak','Bagel Fat One',cursive;font-weight:400;
+    font-size:clamp(40px,7vw,108px);line-height:0.95;letter-spacing:-0.02em;
+    background:linear-gradient(90deg,#FF3D8C 0%,#FF6FA0 22%,#FF9C7A 50%,#FFB85E 75%,#FFD43B 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 30px rgba(236,72,153,0.20)) drop-shadow(0 0 60px rgba(255,212,59,0.10));
+    margin-bottom:28px;max-width:920px;
+  }
+  .pricing-sub{
+    font-size:clamp(15px,1.3vw,18px);color:#aaa;max-width:640px;
+    line-height:1.55;margin-bottom:64px;
+  }
+  .pricing-sub strong{color:#fff;font-weight:600}
+
+  .pricing-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+    align-items:stretch;
+  }
+  .tier-card{
+    position:relative;background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:20px;padding:32px 28px 36px;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    transition:transform .3s ease,border-color .3s ease,background .3s ease;
+    display:flex;flex-direction:column;
+  }
+  .tier-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(255,255,255,0.22);
+    background:rgba(255,255,255,0.05);
+  }
+  .tier-card.featured{
+    background:linear-gradient(135deg,rgba(236,72,153,0.08) 0%,rgba(255,184,94,0.04) 100%);
+    border-color:rgba(236,72,153,0.45);
+    box-shadow:0 0 40px rgba(236,72,153,0.10);
+  }
+  .tier-card.featured:hover{
+    border-color:rgba(236,72,153,0.7);
+    box-shadow:0 0 60px rgba(236,72,153,0.20);
+  }
+  .tier-card .tier-badge{
+    position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+    background:linear-gradient(90deg,#EC4899,#FFD43B);
+    color:#000;font-size:10px;font-weight:800;letter-spacing:2px;
+    padding:6px 14px;border-radius:999px;text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .tier-card .tier-name{
+    font-size:13px;letter-spacing:2.5px;text-transform:uppercase;
+    color:#888;font-weight:600;margin-bottom:18px;
+  }
+  .tier-card.featured .tier-name{color:#FFB85E}
+  .tier-card .tier-headline{
+    font-size:22px;font-weight:800;letter-spacing:-0.5px;
+    color:#fff;margin-bottom:18px;line-height:1.2;
+  }
+  .tier-card .price-block{margin-bottom:22px;line-height:1}
+  .tier-card .price-main{
+    font-size:44px;font-weight:800;letter-spacing:-2px;color:#fff;
+    font-variant-numeric:tabular-nums;
+  }
+  .tier-card .price-suffix{
+    font-size:14px;color:#888;margin-left:6px;font-weight:600;
+  }
+  .tier-card .price-note{
+    font-size:13px;color:#aaa;margin-top:8px;font-weight:500;
+  }
+  .tier-card.featured .price-note{color:#FFB85E}
+  .tier-card ul{
+    list-style:none;padding:0;margin:0 0 28px 0;flex:1;
+  }
+  .tier-card ul li{
+    font-size:14px;color:#bbb;line-height:1.5;padding:8px 0;
+    border-top:1px solid rgba(255,255,255,0.06);
+    display:flex;align-items:flex-start;gap:10px;
+  }
+  .tier-card ul li:first-child{border-top:0}
+  .tier-card ul li::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:rgba(255,255,255,0.3);margin-top:7px;flex-shrink:0;
+  }
+  .tier-card.featured ul li::before{background:#EC4899}
+  .tier-card ul li strong{color:#fff;font-weight:600}
+
+  .tier-cta{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    text-decoration:none;font-weight:700;font-size:14px;letter-spacing:1.5px;
+    text-transform:uppercase;padding:16px 24px;border-radius:12px;
+    transition:transform .2s,box-shadow .2s,background .2s,border-color .2s;
+  }
+  .tier-card.free .tier-cta{
+    background:transparent;color:#fff;
+    border:1.5px solid rgba(255,255,255,0.2);
+  }
+  .tier-card.free .tier-cta:hover{
+    background:rgba(255,255,255,0.05);
+    border-color:rgba(255,255,255,0.4);transform:translateY(-2px);
+  }
+  .tier-card.monthly .tier-cta{
+    background:linear-gradient(90deg,#EC4899 0%,#FF9C7A 50%,#FFD43B 100%);
+    color:#000;border:none;
+    box-shadow:0 8px 24px rgba(236,72,153,0.30);
+  }
+  .tier-card.monthly .tier-cta:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 32px rgba(236,72,153,0.45);
+  }
+  .tier-card.lifetime .tier-cta{
+    background:rgba(236,72,153,0.10);color:#fff;
+    border:1.5px solid rgba(236,72,153,0.45);
+  }
+  .tier-card.lifetime .tier-cta:hover{
+    background:rgba(236,72,153,0.18);
+    border-color:rgba(255,212,59,0.6);transform:translateY(-2px);
+  }
+
+  .pricing-fineprint{
+    text-align:center;font-size:13px;color:#666;
+    margin-top:42px;line-height:1.6;
+  }
+  .pricing-fineprint strong{color:#aaa;font-weight:600}
+
+  @media (max-width:980px){
+    .pricing-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto}
+  }
+  @media (max-width:640px){
+    .pricing-section{padding:64px 24px 80px}
+    .pricing-quote{font-size:12vw}
+  }
+
   /* ═══ SEO content section — visible to readers and crawlers, brand-styled ═══ */
   .seo-section{
     max-width:920px;margin:0 auto;padding:80px 24px 40px;
@@ -532,6 +830,10 @@
       <span>Live Track Record</span>
       <span class="arrow">↓</span>
     </a>
+    <a href="#how" class="how-tab">
+      <span>How we do it</span>
+      <span class="how-tab-arrow">↓</span>
+    </a>
     <div class="features-strip">
       <span>Real-time whale alerts</span>
       <span>30-min pre-game picks</span>
@@ -544,24 +846,17 @@
     <h1>Track<br>Who's<br>Betting<span class="accent">.</span></h1>
     <div class="right-stack">
       <div class="countdown-block">
-        <div class="label">Going Private In</div>
-        <div class="timer">
-          <div class="unit-box"><span class="number" id="cd-days">34</span><span class="unit-label">Days</span></div>
-          <span class="sep">:</span>
-          <div class="unit-box"><span class="number" id="cd-hours">00</span><span class="unit-label">Hrs</span></div>
-          <span class="sep">:</span>
-          <div class="unit-box"><span class="number" id="cd-minutes">00</span><span class="unit-label">Min</span></div>
-          <span class="sep">:</span>
-          <div class="unit-box"><span class="number" id="cd-seconds">00</span><span class="unit-label">Sec</span></div>
+        <div class="label">Free Discord · Live Now</div>
+        <div class="timer" style="align-items:center;gap:14px;">
+          <span style="font-size:clamp(28px,3.8vw,44px);font-weight:800;color:#fff;letter-spacing:-1px;">🟢 LIVE</span>
         </div>
-        <div class="suffix">June 1, 2026</div>
+        <div class="suffix">30-min pre-game smart-money signals</div>
       </div>
       <div class="cta-group">
-        <a class="cta-secondary" href="#waitlist" id="waitlist-btn">
-          <span>Lifetime Access</span>
-          <span class="badge">Coming Soon</span>
+        <a class="cta-secondary" href="#pricing">
+          <span>View Pricing</span>
         </a>
-        <a class="cta" href="https://discord.gg/ymgtvD2Zj5">Join Discord →</a>
+        <a class="cta" href="https://discord.gg/SYU2AbxWzP">Join Free Discord →</a>
       </div>
     </div>
   </div>
@@ -605,7 +900,7 @@
         </div>
       </div>
       <div class="calls-cta">
-        <a href="https://discord.gg/ymgtvD2Zj5">See live calls in Discord →</a>
+        <a href="https://discord.gg/SYU2AbxWzP">See live calls in Discord →</a>
       </div>
     </div>
 
@@ -644,6 +939,147 @@
 </section>
 <!-- ═══════════ /Dashboard section ═══════════ -->
 
+<!-- ═══════════ "How We Do It" section ═══════════ -->
+<section id="how" class="how-section" aria-label="How PolyBaby works">
+  <div class="how-inner">
+
+    <div class="how-eyebrow">How we do it</div>
+
+    <div class="how-quote">
+      The line is a vote.<br>
+      The wallets are the answer.
+    </div>
+
+    <p class="how-sub">
+      Every trade on Polymarket is on-chain. We don't read the price — we read the <strong>behavior underneath the price</strong>. Four layers of filtering, applied in real time to every market.
+    </p>
+
+    <div class="how-steps">
+
+      <div class="how-step">
+        <div class="num"><span class="step-dot"></span>01 · Listen</div>
+        <h3>Stream</h3>
+        <p>Every trade on Polymarket is ingested in real time. Millions of micro-decisions a day, across every active sports market. No sampling. No delay.</p>
+      </div>
+
+      <div class="how-step">
+        <div class="num"><span class="step-dot"></span>02 · Identify</div>
+        <h3>Rank</h3>
+        <p>A scored list of the wallets that have, over time, been on the right side of more markets than the public — ranked by historical PnL and behavior, not by hype.</p>
+      </div>
+
+      <div class="how-step">
+        <div class="num"><span class="step-dot"></span>03 · Converge</div>
+        <h3>Pattern</h3>
+        <p>A signal fires when <strong>multiple</strong> of these wallets independently stack the same side, while the public consensus points the other way. Not one wallet. The pattern.</p>
+      </div>
+
+      <div class="how-step featured">
+        <div class="num"><span class="step-dot"></span>04 · Gate</div>
+        <h3>Filter</h3>
+        <p>Smart wallets stacking isn't enough. Their position must be <strong>unhedged</strong>, the capital meaningful, and external consensus checked. Only picks that clear every filter become premium calls.</p>
+      </div>
+
+    </div>
+
+    <div class="how-footer">
+      <p class="proof">
+        Every pick is logged before the event resolves. <strong><span id="how-wins">—</span> wins · <span id="how-losses">—</span> losses · <span id="how-total">—</span> calls logged publicly · no deletions.</strong> The track record is the proof.
+      </p>
+      <a class="how-cta" href="#dashboard"><span>See the receipts</span><span>↑</span></a>
+    </div>
+
+  </div>
+</section>
+<!-- ═══════════ /How We Do It ═══════════ -->
+
+<!-- ═══════════ Pricing section ═══════════ -->
+<section id="pricing" class="pricing-section" aria-label="PolyBaby pricing">
+  <div class="pricing-inner">
+
+    <div class="pricing-eyebrow">Join</div>
+
+    <div class="pricing-quote">
+      Pick your edge.
+    </div>
+
+    <p class="pricing-sub">
+      Three ways in. Same data underneath. <strong>The gates close at 200 members.</strong>
+    </p>
+
+    <div class="pricing-grid">
+
+      <!-- Tier 1: Free -->
+      <div class="tier-card free">
+        <div class="tier-name">Tier 1 · Basic</div>
+        <div class="tier-headline">Free Discord access</div>
+        <div class="price-block">
+          <span class="price-main">$0</span>
+          <span class="price-suffix">/forever</span>
+        </div>
+        <ul>
+          <li>Public scoreboard + every call we make</li>
+          <li>Whale alerts on top wallet activity</li>
+          <li>Smart-money divergence signals</li>
+          <li>Track record, no deletions</li>
+        </ul>
+        <a class="tier-cta" href="https://whop.com/polybabyalerts/polybaby-free?utm_source=polybabyalerts&utm_medium=website&utm_campaign=pricing-free">
+          Join Free
+        </a>
+      </div>
+
+      <!-- Tier 2: Monthly (Featured) -->
+      <div class="tier-card monthly featured">
+        <div class="tier-badge">Most Popular</div>
+        <div class="tier-name">Tier 2 · Insider</div>
+        <div class="tier-headline">Insider Alerts</div>
+        <div class="price-block">
+          <span class="price-main">$499</span>
+          <span class="price-suffix">/month</span>
+          <div class="price-note">7-day free trial · cancel anytime</div>
+        </div>
+        <ul>
+          <li><strong>Everything in Free</strong></li>
+          <li><strong>Premium picks</strong> — only when brain HIGH + wallet gate fires</li>
+          <li>Private <strong>#polybaby-insider</strong> channel</li>
+          <li>Direct line to PolyBaby</li>
+          <li>Same edge that took the public dataset from 53.8% → 67.2% WR</li>
+        </ul>
+        <a class="tier-cta" href="https://whop.com/checkout/plan_DP7OufLzLCx8D?utm_source=polybabyalerts&utm_medium=website&utm_campaign=pricing-monthly">
+          Start 7-Day Trial
+        </a>
+      </div>
+
+      <!-- Tier 3: Lifetime -->
+      <div class="tier-card lifetime">
+        <div class="tier-name">Tier 3 · Lifetime</div>
+        <div class="tier-headline">Insider, locked in</div>
+        <div class="price-block">
+          <span class="price-main">$2,499</span>
+          <span class="price-suffix">one-time</span>
+          <div class="price-note">No renewals · no price hikes</div>
+        </div>
+        <ul>
+          <li><strong>Everything in Insider, forever</strong></li>
+          <li>Lock the price before private launch</li>
+          <li>Grandfather access to every future tier</li>
+          <li>One payment, lifetime alerts</li>
+        </ul>
+        <a class="tier-cta" href="https://whop.com/checkout/plan_x4Uynm3RrJ5HJ?utm_source=polybabyalerts&utm_medium=website&utm_campaign=pricing-lifetime">
+          Own Forever
+        </a>
+      </div>
+
+    </div>
+
+    <p class="pricing-fineprint">
+      <strong>Card required for trial.</strong> Cancel anytime within 7 days, no charge. After trial, $499/month billed automatically until you cancel.
+    </p>
+
+  </div>
+</section>
+<!-- ═══════════ /Pricing section ═══════════ -->
+
 <!-- ═══════════ SEO content (also useful for first-time visitors) ═══════════ -->
 <section class="seo-section" aria-label="About PolyBaby">
   <h2>The Polymarket tracker built by traders</h2>
@@ -680,10 +1116,10 @@
 
   <h2>How to start</h2>
   <p>
-    Free Discord: <a href="https://discord.gg/ymgtvD2Zj5">discord.gg/ymgtvD2Zj5</a>. You'll
+    Free Discord: <a href="https://discord.gg/SYU2AbxWzP">discord.gg/SYU2AbxWzP</a>. You'll
     get every signal the moment it fires. Coming soon: a paid <strong>Polymarket Insider</strong>
     tier with stake-sized signals, politics-only feeds at 1.20+ odds, and per-league
-    backtest dashboards. Countdown above.
+    backtest dashboards.
   </p>
 </section>
 
@@ -692,7 +1128,7 @@
   <div>
     <a href="mailto:polybabyalerts@gmail.com">Contact</a>
     <a href="privacy.html">Privacy</a>
-    <a href="https://discord.gg/ymgtvD2Zj5">Discord</a>
+    <a href="https://discord.gg/SYU2AbxWzP">Discord</a>
   </div>
 </div>
 
@@ -713,32 +1149,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-  // Live countdown to June 1, 2026 (going private) — ticks every second
+  // Countdown removed 2026-07-09 — site is live, replaced with LIVE badge + Discord CTA
   (function() {
-    const goPrivate = new Date('2026-06-01T00:00:00').getTime();
-    const dEl = document.getElementById('cd-days');
-    const hEl = document.getElementById('cd-hours');
-    const mEl = document.getElementById('cd-minutes');
-    const sEl = document.getElementById('cd-seconds');
-    if (!dEl || !hEl || !mEl || !sEl) return;
-    const pad = (n) => String(n).padStart(2, '0');
-    function tick() {
-      const diff = goPrivate - Date.now();
-      if (diff <= 0) {
-        dEl.textContent = '00'; hEl.textContent = '00'; mEl.textContent = '00'; sEl.textContent = '00';
-        return;
-      }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const mins = Math.floor((diff / (1000 * 60)) % 60);
-      const secs = Math.floor((diff / 1000) % 60);
-      dEl.textContent = pad(days);
-      hEl.textContent = pad(hours);
-      mEl.textContent = pad(mins);
-      sEl.textContent = pad(secs);
-    }
-    tick();
-    setInterval(tick, 1000);
+    // no-op — hero countdown deprecated
+    return;
   })();
 
   // Live stats from Neon via /api/stats — falls back to hardcoded text if API fails
@@ -757,6 +1171,9 @@
       setText('track-losses', s.losses);
       setText('track-accuracy', s.accuracy);
       setText('track-total', totalCalls || null);
+      setText('how-wins', s.wins);
+      setText('how-losses', s.losses);
+      setText('how-total', totalCalls || null);
     })
     .catch(() => {/* silent — keeps hardcoded fallback */});
 
@@ -904,7 +1321,7 @@
         const returnText = isWin ? '+' + call.returnPct + '%'
           : call.outcome === 'LOSS' ? '—'
           : (call.returnPct != null ? '+' + call.returnPct + '% if W' : '—');
-        const url = esc(call.marketUrl || 'https://discord.gg/ymgtvD2Zj5');
+        const url = esc(call.marketUrl || 'https://discord.gg/SYU2AbxWzP');
         const conf = esc(call.confidence || '—').replace(/—\s*single-trader.*/i, 'LOW');
         return '<a class="call-card" href="' + url + '" target="_blank" rel="noopener noreferrer">' +
           '<div class="cc-top">' +
