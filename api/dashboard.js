@@ -74,16 +74,35 @@ export default async function handler() {
       // Includes archived rows so each league shows its full lifetime record
       // (otherwise older wins like Cricket #457 hide in the Others residual).
       sql`
+        WITH labelled AS (
+          SELECT
+            -- Refine the OtherSports catch-all using the Polymarket slug
+            -- prefix. deriveSport() only emits canonical league tags, so
+            -- college football, WNBA and CBA all collapsed into one opaque
+            -- "OtherSports" row that hid their individual win rates.
+            CASE
+              WHEN market_slug ILIKE 'nfl-%'                              THEN 'NFL'
+              WHEN market_slug ILIKE 'cfb-%'  OR market_slug ILIKE 'ncaaf-%'
+                OR market_slug ILIKE 'ncaa-%' OR market_slug ILIKE 'cbb-%'
+                OR market_slug ILIKE 'ncaab-%'                            THEN 'NCAA'
+              WHEN market_slug ILIKE 'wnba-%'                             THEN 'WNBA'
+              WHEN sport IS NOT NULL AND sport <> 'OtherSports'           THEN sport
+              WHEN sport = 'OtherSports'                                  THEN 'OtherSports'
+              ELSE 'OtherSports'
+            END AS sport,
+            outcome
+          FROM calls
+          WHERE (category IS NULL OR NOT (category = ANY(${INSIDER_CATEGORIES})))
+            AND (sport    IS NULL OR NOT (sport    = ANY(${INSIDER_CATEGORIES})))
+        )
         SELECT
-          COALESCE(sport, 'OtherSports') AS sport,
+          sport,
           COUNT(*)::int AS calls,
           SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
           SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
           SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
-        FROM calls
-        WHERE (category IS NULL OR NOT (category = ANY(${INSIDER_CATEGORIES})))
-          AND (sport    IS NULL OR NOT (sport    = ANY(${INSIDER_CATEGORIES})))
-        GROUP BY COALESCE(sport, 'OtherSports')
+        FROM labelled
+        GROUP BY sport
         ORDER BY calls DESC
       `,
       // Monthly P&L — the hero chart's series. One row per calendar month

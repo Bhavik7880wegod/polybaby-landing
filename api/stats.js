@@ -6,12 +6,25 @@ const sql = neon(process.env.DATABASE_URL);
 
 export default async function handler() {
   try {
+    // Totals derive from the calls table, NOT call_counter. The counter
+    // carries ~248 pre-Neon-migration increments that have no per-call row,
+    // so counter-derived accuracy (57.1%) disagreed with the row-derived
+    // figure the dashboard chart is built from (55.3%). One number, one
+    // meaning: everything public reads from rows. next_id still comes from
+    // the counter since that's the live call-number sequence.
     const [c] = await sql`
-      SELECT next_id, wins, losses, pending,
-             ROUND(100.0 * wins / NULLIF(wins + losses, 0), 1)::float AS accuracy,
-             updated_at
-      FROM call_counter
-      LIMIT 1
+      SELECT
+        (SELECT next_id FROM call_counter LIMIT 1)     AS next_id,
+        (SELECT updated_at FROM call_counter LIMIT 1)  AS updated_at,
+        COUNT(*) FILTER (WHERE outcome = 'WIN')::int   AS wins,
+        COUNT(*) FILTER (WHERE outcome = 'LOSS')::int  AS losses,
+        COUNT(*) FILTER (WHERE outcome IS NULL
+                            OR outcome NOT IN ('WIN','LOSS'))::int AS pending,
+        ROUND(
+          100.0 * COUNT(*) FILTER (WHERE outcome = 'WIN')
+          / NULLIF(COUNT(*) FILTER (WHERE outcome IN ('WIN','LOSS')), 0)
+        , 1)::float AS accuracy
+      FROM calls
     `;
 
     if (!c) {
