@@ -330,14 +330,20 @@
   #dashboard .d-label::after{content:'';flex:1;height:1px;background:var(--d-border)}
 
   #dashboard .d-grid{
-    display:grid;grid-template-columns:1fr 420px;gap:24px;
-    align-items:start;
+    display:grid;grid-template-columns:1fr 440px;gap:24px;
+    align-items:stretch;
     max-width:1280px;margin:0 auto;
   }
   /* Right rail stacks the performance chart with the per-league table
      directly beneath it, so a league's win rate is read against the same
      breakeven context the chart establishes. */
-  #dashboard .d-rail{display:flex;flex-direction:column;gap:24px}
+  #dashboard .d-rail{display:flex;flex-direction:column;gap:12px}
+  #dashboard .d-rail > .panel{
+    flex:1;display:flex;flex-direction:column;
+  }
+  /* League rows share the leftover height evenly so the table fills the
+     column instead of clustering at the top with dead space beneath. */
+  #dashboard .d-rail .categories-list{flex:1;justify-content:space-evenly}
   @media (max-width:1100px){#dashboard .d-grid{grid-template-columns:1fr}}
   /* ═══════════ "How We Do It" section ═══════════ */
   .how-section{
@@ -665,8 +671,8 @@
      whose tick marks the breakeven rate for that league's average entry
      price. Bar past the tick = the league cleared its own price. */
   #dashboard .cat-row{
-    display:grid;grid-template-columns:78px 1fr 74px;
-    align-items:center;gap:12px;padding:9px 6px;border-radius:8px;
+    display:grid;grid-template-columns:86px 1fr 80px;
+    align-items:center;gap:14px;padding:11px 8px;border-radius:9px;
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
     font-size:12px;font-variant-numeric:tabular-nums;
     transition:background 0.15s;
@@ -674,15 +680,15 @@
   #dashboard .cat-row:hover{background:var(--d-surface-hover)}
   #dashboard .cat-label{
     color:var(--d-text);font-weight:700;letter-spacing:1px;
-    text-transform:uppercase;font-size:10.5px;white-space:nowrap;
+    text-transform:uppercase;font-size:11.5px;white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis;
   }
   #dashboard .cat-meter{
-    position:relative;height:6px;border-radius:3px;
+    position:relative;height:8px;border-radius:4px;
     background:rgba(255,255,255,0.07);overflow:hidden;
   }
   #dashboard .cat-fill{
-    position:absolute;left:0;top:0;bottom:0;border-radius:3px;
+    position:absolute;left:0;top:0;bottom:0;border-radius:4px;
     background:var(--d-win);transition:width .5s ease;
   }
   #dashboard .cat-fill.is-under{background:var(--d-loss)}
@@ -694,10 +700,10 @@
   #dashboard .cat-right{
     display:flex;align-items:baseline;justify-content:flex-end;gap:7px;
   }
-  #dashboard .cat-rate{color:var(--d-text);font-size:12px;font-weight:700}
+  #dashboard .cat-rate{color:var(--d-text);font-size:13px;font-weight:700}
   #dashboard .cat-rate.is-under{color:var(--d-loss)}
   #dashboard .cat-rate.is-over{color:var(--d-win)}
-  #dashboard .cat-count{color:var(--d-muted);font-size:10px}
+  #dashboard .cat-count{color:var(--d-muted);font-size:10.5px}
   #dashboard .chart-legend{
     display:flex;gap:18px;margin-top:14px;padding-top:12px;
     border-top:1px solid var(--d-border);
@@ -711,7 +717,8 @@
   #dashboard .lg-neg{background:var(--d-loss)}
   #dashboard .cat-footer{
     margin-top:12px;padding-top:10px;border-top:1px solid var(--d-border);
-    color:var(--d-muted);font-size:10.5px;line-height:1.5;letter-spacing:0.2px;
+    color:var(--d-muted);font-size:10.5px;line-height:1.6;letter-spacing:0.2px;
+    white-space:pre-line;
   }
   #dashboard .cat-footer:empty{display:none}
   .dot-win{color:#22D478}
@@ -1001,8 +1008,8 @@
     </div>
 
     <div class="d-rail">
+      <div class="d-label">By league</div>
       <div class="panel">
-        <div class="d-label">By league</div>
         <div class="categories-list" id="d-categories">
           <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-meter"></span><span class="cat-rate skeleton">&nbsp;</span></div>
           <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-meter"></span><span class="cat-rate skeleton">&nbsp;</span></div>
