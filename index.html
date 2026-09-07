@@ -777,7 +777,36 @@
   #dashboard .calls-cta a:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(236,72,153,0.4)}
 
   #dashboard .chart-panel{display:flex;flex-direction:column}
-  #dashboard .chart-host{flex:1;min-height:240px}
+  #dashboard .chart-host{flex:1;min-height:330px}
+  #dashboard .chart-cta{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    flex-wrap:wrap;margin-top:18px;padding:16px 18px;border-radius:14px;
+    background:linear-gradient(90deg,rgba(236,72,153,0.13),rgba(255,156,122,0.07));
+    border:1px solid rgba(236,72,153,0.24);
+  }
+  #dashboard .chart-cta .cc-copy{display:flex;flex-direction:column;gap:4px;min-width:0}
+  #dashboard .chart-cta .cc-copy strong{
+    font-size:14.5px;font-weight:700;color:var(--d-text);letter-spacing:-0.1px;
+  }
+  #dashboard .chart-cta .cc-copy span{
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:10.5px;letter-spacing:.6px;color:var(--d-muted);
+  }
+  #dashboard .chart-cta .cta{
+    flex-shrink:0;padding:12px 22px;border-radius:999px;
+    background:linear-gradient(90deg,#EC4899,#FF9C7A);
+    color:#0B0B0E;font-weight:800;font-size:13.5px;text-decoration:none;
+    white-space:nowrap;transition:transform .15s,box-shadow .15s;
+  }
+  #dashboard .chart-cta .cta:hover{
+    transform:translateY(-2px);box-shadow:0 12px 34px rgba(236,72,153,0.36);
+  }
+  #dashboard .lg-note{margin-left:auto;opacity:.75;letter-spacing:.6px;text-transform:none}
+  @media (max-width:560px){
+    #dashboard .chart-cta{flex-direction:column;align-items:stretch;text-align:center}
+    #dashboard .chart-cta .cta{text-align:center}
+    #dashboard .lg-note{display:none}
+  }
   #dashboard .chart-foot{
     display:flex;justify-content:space-between;align-items:baseline;
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
@@ -818,7 +847,7 @@
     font-size:11px;color:var(--d-muted);letter-spacing:.3px;line-height:1.6;white-space:pre-line;
   }
 
-  #dashboard .res-section{margin:20px 0 0}
+  #dashboard .res-section{max-width:1280px;margin:32px auto 0}
   #dashboard .res-table{
     width:100%;border-collapse:collapse;
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
@@ -945,41 +974,8 @@
 
   <div class="d-grid">
     <div class="calls-area">
-      <div class="d-label">Recent calls</div>
-      <div class="panel" style="padding:18px">
-        <div class="calls-grid" id="d-calls">
-          <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
-          <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
-          <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
-        </div>
-      </div>
-    <div class="res-section">
-      <div class="d-label">Recent resolutions</div>
-      <div class="panel" style="padding:0;overflow:hidden">
-        <table class="res-table">
-          <thead>
-            <tr>
-              <th class="res-date">Date</th>
-              <th class="res-tag">Tag</th>
-              <th>Market</th>
-              <th class="res-side">Side</th>
-              <th class="res-status">Result</th>
-              <th class="res-return">Return</th>
-            </tr>
-          </thead>
-          <tbody id="d-res-body">
-            <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
-            <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
-            <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    </div>
-
-    <div class="d-rail">
+      <div class="d-label">Monthly performance</div>
       <div class="panel chart-panel">
-        <div class="d-label">Monthly performance</div>
         <div class="form-lead" id="d-form-lead">
           <div class="form-headline">
             <span class="form-period" id="d-form-period">Last 30 days</span>
@@ -992,9 +988,19 @@
         <div class="chart-legend">
           <span><i class="lg-swatch lg-pos"></i>Above breakeven</span>
           <span><i class="lg-swatch lg-neg"></i>Below breakeven</span>
+          <span class="lg-note">Breakeven = average entry price</span>
+        </div>
+        <div class="chart-cta">
+          <div class="cc-copy">
+            <strong id="d-cta-head">Every call, live, before it resolves</strong>
+            <span>Free Discord &middot; 30-min pre-game smart-money signals</span>
+          </div>
+          <a class="cta" href="https://discord.gg/SYU2AbxWzP">Join Free Discord &rarr;</a>
         </div>
       </div>
+    </div>
 
+    <div class="d-rail">
       <div class="panel">
         <div class="d-label">By league</div>
         <div class="categories-list" id="d-categories">
@@ -1006,6 +1012,29 @@
       </div>
     </div>
   </div>
+
+    <div class="res-section">
+    <div class="d-label">Recent resolutions</div>
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="res-table">
+        <thead>
+          <tr>
+            <th class="res-date">Date</th>
+            <th class="res-tag">Tag</th>
+            <th>Market</th>
+            <th class="res-side">Side</th>
+            <th class="res-status">Result</th>
+            <th class="res-return">Return</th>
+          </tr>
+        </thead>
+        <tbody id="d-res-body">
+          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
 
 </section>
 <!-- ═══════════ /Dashboard section ═══════════ -->
@@ -1338,8 +1367,14 @@
       // Meter fill = win rate. Tick = breakeven (that league's avg entry
       // price). Fill colour says whether the league cleared its own price,
       // which is the only reading of a win rate that means anything.
+      // Ranked best -> worst by edge (points clear of that league's own
+      // breakeven), not by call volume. Leagues with nothing resolved yet
+      // are dropped entirely -- an empty meter reads as a zero, not as
+      // "no data", which is worse than showing nothing.
       const rows = data.categories
-        .filter(cat => (cat.calls || 0) > 0)
+        .filter(cat => Number(cat.resolved || 0) > 0 && cat.edge != null)
+        .slice()
+        .sort((a, b) => (b.edge - a.edge) || (b.resolved - a.resolved))
         .map(cat => {
           const resolved = Number(cat.resolved || 0);
           const wr = (resolved > 0 && cat.winRate != null) ? cat.winRate : null;
@@ -1392,39 +1427,6 @@
         }
         footEl.textContent = bits.join('\n');
       }
-    }
-
-    const callsEl = $('d-calls');
-    if (callsEl && Array.isArray(data.recentCalls) && data.recentCalls.length) {
-      callsEl.innerHTML = data.recentCalls.slice(0, 6).map(call => {
-        const tag = esc(fmtTag(call.sport));
-        const status = call.outcome === 'WIN' ? 'is-win'
-          : call.outcome === 'LOSS' ? 'is-loss' : 'is-live';
-        const statusLabel = call.outcome === 'WIN' ? 'WIN'
-          : call.outcome === 'LOSS' ? 'LOSS' : 'LIVE';
-        const sideLine = (call.side && call.entryPrice)
-          ? 'Buy ' + esc(call.side) + ' @ ' + Math.round(call.entryPrice * 100) + '%'
-          : '—';
-        const isWin = call.outcome === 'WIN' && call.returnPct != null;
-        const returnText = isWin ? '+' + call.returnPct + '%'
-          : call.outcome === 'LOSS' ? '—'
-          : (call.returnPct != null ? '+' + call.returnPct + '% if W' : '—');
-        const url = esc(call.marketUrl || 'https://discord.gg/SYU2AbxWzP');
-        const conf = esc(call.confidence || '—').replace(/—\s*single-trader.*/i, 'LOW');
-        return '<a class="call-card" href="' + url + '" target="_blank" rel="noopener noreferrer">' +
-          '<div class="cc-top">' +
-            '<span class="cc-tag">' + tag + ' · #' + call.callNumber + '</span>' +
-            '<span class="cc-status ' + status + '"><span class="dot"></span>' + statusLabel + '</span>' +
-          '</div>' +
-          '<div class="cc-title">' + esc(call.marketTitle) + '</div>' +
-          '<div class="cc-side">' + sideLine + '</div>' +
-          '<div class="cc-divider"></div>' +
-          '<div class="cc-meta">' +
-            '<span>' + conf + '</span>' +
-            '<span class="cc-return ' + (isWin ? 'is-win' : '') + '">' + returnText + '</span>' +
-          '</div>' +
-        '</a>';
-      }).join('');
     }
 
     const resEl = $('d-res-body');
@@ -1481,6 +1483,10 @@
           : '\u2014');
         pnlEl2.classList.toggle('is-neg', !up);
       }
+      const ctaHead = $('d-cta-head');
+      if (ctaHead) {
+        ctaHead.textContent = cur.resolved + ' calls resolved this month \u2014 every one posted before the event';
+      }
       if (subEl) {
         const be = cur.breakevenWr != null ? cur.breakevenWr.toFixed(1) + '%' : '\u2014';
         let sub = cur.wins + 'W / ' + cur.losses + 'L across ' + cur.resolved +
@@ -1499,7 +1505,7 @@
       if (chartEl) {
         new ApexCharts(chartEl, {
           chart: {
-            type: 'bar', height: 250, toolbar: { show: false }, zoom: { enabled: false },
+            type: 'bar', height: 330, toolbar: { show: false }, zoom: { enabled: false },
             background: 'transparent', fontFamily: 'JetBrains Mono, SF Mono, monospace',
             animations: { enabled: true, easing: 'easeinout', speed: 650 }
           },
@@ -1513,7 +1519,7 @@
           }],
           plotOptions: {
             bar: {
-              columnWidth: '46%', borderRadius: 4, borderRadiusApplication: 'end',
+              columnWidth: '38%', borderRadius: 5, borderRadiusApplication: 'end',
               dataLabels: { position: 'top' },
               colors: {
                 ranges: [
@@ -1527,10 +1533,10 @@
             enabled: true,
             formatter: (v) => (v > 0 ? '+' : '') + v,
             offsetY: -18,
-            style: { fontSize: '10px', fontWeight: 700, colors: ['#9AA3AF'] }
+            style: { fontSize: '11.5px', fontWeight: 700, colors: ['#9AA3AF'] }
           },
           xaxis: {
-            labels: { style: { colors: '#888', fontSize: '10.5px' } },
+            labels: { style: { colors: '#9AA3AF', fontSize: '11.5px', fontWeight: 600 } },
             axisBorder: { show: false }, axisTicks: { show: false },
             crosshairs: { show: false }
           },
