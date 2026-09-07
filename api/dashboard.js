@@ -90,7 +90,8 @@ export default async function handler() {
               WHEN sport = 'OtherSports'                                  THEN 'OtherSports'
               ELSE 'OtherSports'
             END AS sport,
-            outcome
+            outcome,
+            entry_price
           FROM calls
           WHERE (category IS NULL OR NOT (category = ANY(${INSIDER_CATEGORIES})))
             AND (sport    IS NULL OR NOT (sport    = ANY(${INSIDER_CATEGORIES})))
@@ -100,7 +101,15 @@ export default async function handler() {
           COUNT(*)::int AS calls,
           SUM(CASE WHEN outcome = 'WIN'  THEN 1 ELSE 0 END)::int AS wins,
           SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
-          SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved
+          SUM(CASE WHEN outcome IN ('WIN','LOSS') THEN 1 ELSE 0 END)::int AS resolved,
+          -- Breakeven WR for the league = its average entry price. Lets the
+          -- UI show whether a league cleared the price it actually paid.
+          (AVG(entry_price) FILTER (WHERE outcome IN ('WIN','LOSS')) * 100)::float8 AS breakeven_wr,
+          SUM(CASE
+                WHEN outcome = 'WIN' AND entry_price > 0 THEN (1.0 / entry_price - 1) * 100
+                WHEN outcome = 'LOSS' THEN -100
+                ELSE 0
+              END)::float8 AS pnl
         FROM labelled
         GROUP BY sport
         ORDER BY calls DESC
@@ -187,15 +196,24 @@ export default async function handler() {
         const wins = Number(r.wins || 0);
         const losses = Number(r.losses || 0);
         const resolved = Number(r.resolved || 0);
+        const winRate = resolved > 0
+          ? Math.round((wins / resolved) * 1000) / 10
+          : null;
+        const breakevenWr = r.breakeven_wr != null
+          ? Math.round(Number(r.breakeven_wr) * 10) / 10
+          : null;
         return {
           label: r.sport,
           calls: Number(r.calls || 0),
           wins,
           losses,
           resolved,
-          winRate: resolved > 0
-            ? Math.round((wins / resolved) * 1000) / 10
+          winRate,
+          breakevenWr,
+          edge: (winRate != null && breakevenWr != null)
+            ? Math.round((winRate - breakevenWr) * 10) / 10
             : null,
+          pnl: Math.round(Number(r.pnl || 0) * 100) / 100,
         };
       });
 

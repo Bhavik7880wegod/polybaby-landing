@@ -330,14 +330,14 @@
   #dashboard .d-label::after{content:'';flex:1;height:1px;background:var(--d-border)}
 
   #dashboard .d-grid{
-    display:grid;grid-template-columns:280px 1fr 360px;gap:24px;
+    display:grid;grid-template-columns:1fr 420px;gap:24px;
     align-items:start;
     max-width:1280px;margin:0 auto;
   }
-  /* Categories panel keeps its compact natural size, but vertically
-     centers within the grid row so it lines up with the middle of the
-     taller recent-calls column instead of floating at the top. */
-  #dashboard .d-grid > .panel:first-child{align-self:center}
+  /* Right rail stacks the performance chart with the per-league table
+     directly beneath it, so a league's win rate is read against the same
+     breakeven context the chart establishes. */
+  #dashboard .d-rail{display:flex;flex-direction:column;gap:24px}
   @media (max-width:1100px){#dashboard .d-grid{grid-template-columns:1fr}}
   /* ═══════════ "How We Do It" section ═══════════ */
   .how-section{
@@ -660,21 +660,55 @@
     -webkit-backdrop-filter:blur(24px);padding:24px;
   }
 
-  #dashboard .categories-list{display:flex;flex-direction:column}
+  #dashboard .categories-list{display:flex;flex-direction:column;gap:2px}
+  /* Each league row carries a meter whose fill is the league's win rate and
+     whose tick marks the breakeven rate for that league's average entry
+     price. Bar past the tick = the league cleared its own price. */
   #dashboard .cat-row{
-    display:grid;grid-template-columns:72px 1fr 62px 36px 12px;
-    align-items:center;gap:8px;padding:11px 4px;
+    display:grid;grid-template-columns:78px 1fr 74px;
+    align-items:center;gap:12px;padding:9px 6px;border-radius:8px;
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
     font-size:12px;font-variant-numeric:tabular-nums;
-    border-top:1px solid var(--d-border);transition:background 0.15s;
+    transition:background 0.15s;
   }
-  #dashboard .cat-row:first-child{border-top:none}
   #dashboard .cat-row:hover{background:var(--d-surface-hover)}
-  #dashboard .cat-label{color:var(--d-text);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px}
-  #dashboard .cat-bar{height:1px;background:var(--d-border-strong);opacity:0.4}
-  #dashboard .cat-count{color:var(--d-muted);font-size:11px;text-align:right}
-  #dashboard .cat-rate{color:var(--d-text);text-align:right;font-size:11px;font-weight:600}
-  #dashboard .cat-dot{font-size:13px;line-height:1;text-align:center}
+  #dashboard .cat-label{
+    color:var(--d-text);font-weight:700;letter-spacing:1px;
+    text-transform:uppercase;font-size:10.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  #dashboard .cat-meter{
+    position:relative;height:6px;border-radius:3px;
+    background:rgba(255,255,255,0.07);overflow:hidden;
+  }
+  #dashboard .cat-fill{
+    position:absolute;left:0;top:0;bottom:0;border-radius:3px;
+    background:var(--d-win);transition:width .5s ease;
+  }
+  #dashboard .cat-fill.is-under{background:var(--d-loss)}
+  #dashboard .cat-fill.is-flat{background:var(--d-muted-strong)}
+  #dashboard .cat-tick{
+    position:absolute;top:-2px;bottom:-2px;width:2px;border-radius:1px;
+    background:rgba(255,255,255,0.55);
+  }
+  #dashboard .cat-right{
+    display:flex;align-items:baseline;justify-content:flex-end;gap:7px;
+  }
+  #dashboard .cat-rate{color:var(--d-text);font-size:12px;font-weight:700}
+  #dashboard .cat-rate.is-under{color:var(--d-loss)}
+  #dashboard .cat-rate.is-over{color:var(--d-win)}
+  #dashboard .cat-count{color:var(--d-muted);font-size:10px}
+  #dashboard .chart-legend{
+    display:flex;gap:18px;margin-top:14px;padding-top:12px;
+    border-top:1px solid var(--d-border);
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;
+    color:var(--d-muted);font-weight:600;
+  }
+  #dashboard .chart-legend span{display:flex;align-items:center;gap:6px}
+  #dashboard .lg-swatch{width:9px;height:9px;border-radius:2px;display:inline-block}
+  #dashboard .lg-pos{background:var(--d-win)}
+  #dashboard .lg-neg{background:var(--d-loss)}
   #dashboard .cat-footer{
     margin-top:12px;padding-top:10px;border-top:1px solid var(--d-border);
     color:var(--d-muted);font-size:10.5px;line-height:1.5;letter-spacing:0.2px;
@@ -762,8 +796,9 @@
   }
   #dashboard .form-lead{margin:2px 0 14px}
   #dashboard .form-headline{
-    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
   }
+  #dashboard .form-headline .form-pnl{flex-basis:100%;font-size:15px;margin-top:2px}
   #dashboard .form-period{
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
     font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
@@ -783,7 +818,7 @@
     font-size:11px;color:var(--d-muted);letter-spacing:.3px;line-height:1.6;white-space:pre-line;
   }
 
-  #dashboard .res-section{max-width:1280px;margin:56px auto 0}
+  #dashboard .res-section{margin:20px 0 0}
   #dashboard .res-table{
     width:100%;border-collapse:collapse;
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
@@ -821,7 +856,7 @@
     #dashboard .d-stats-wrap{margin-bottom:40px}
     #dashboard .d-hero-stats{flex-wrap:wrap;justify-content:center;padding:14px 18px;gap:10px;font-size:11px}
     #dashboard .d-hero-stats .sep{display:none}
-    #dashboard .res-section{margin-top:40px}
+    #dashboard .res-section{margin-top:20px}
     #dashboard .res-table thead th{font-size:9px;padding:10px 8px}
     #dashboard .res-table tbody td{padding:12px 8px;font-size:11px}
   }
@@ -909,16 +944,6 @@
   </div>
 
   <div class="d-grid">
-    <div class="panel">
-      <div class="d-label">Categories</div>
-      <div class="categories-list" id="d-categories">
-        <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
-        <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
-        <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-bar"></span><span class="cat-count skeleton">&nbsp;</span><span class="cat-rate skeleton">&nbsp;</span><span class="cat-dot">·</span></div>
-      </div>
-      <div class="cat-footer" id="d-cat-footer"></div>
-    </div>
-
     <div class="calls-area">
       <div class="d-label">Recent calls</div>
       <div class="panel" style="padding:18px">
@@ -928,51 +953,60 @@
           <div class="call-card"><div class="cc-top"><span class="cc-tag skeleton">&nbsp;</span><span class="cc-status skeleton">&nbsp;</span></div><div class="cc-title skeleton">&nbsp;</div><div class="cc-divider"></div><div class="cc-meta skeleton">&nbsp;</div></div>
         </div>
       </div>
-      <div class="calls-cta">
-        <a href="https://discord.gg/SYU2AbxWzP">See live calls in Discord →</a>
+    <div class="res-section">
+      <div class="d-label">Recent resolutions</div>
+      <div class="panel" style="padding:0;overflow:hidden">
+        <table class="res-table">
+          <thead>
+            <tr>
+              <th class="res-date">Date</th>
+              <th class="res-tag">Tag</th>
+              <th>Market</th>
+              <th class="res-side">Side</th>
+              <th class="res-status">Result</th>
+              <th class="res-return">Return</th>
+            </tr>
+          </thead>
+          <tbody id="d-res-body">
+            <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+            <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+            <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
+    </div>
 
-    <div class="panel chart-panel">
-      <div class="d-label">Monthly performance</div>
-      <div class="form-lead" id="d-form-lead">
-        <div class="form-headline">
-          <span class="form-period" id="d-form-period">Last 30 days</span>
-          <span class="form-wr" id="d-form-wr">&mdash;</span>
-          <span class="form-pnl" id="d-form-pnl">&mdash;</span>
+    <div class="d-rail">
+      <div class="panel chart-panel">
+        <div class="d-label">Monthly performance</div>
+        <div class="form-lead" id="d-form-lead">
+          <div class="form-headline">
+            <span class="form-period" id="d-form-period">Last 30 days</span>
+            <span class="form-wr" id="d-form-wr">&mdash;</span>
+            <span class="form-pnl" id="d-form-pnl">&mdash;</span>
+          </div>
+          <div class="form-sub" id="d-form-sub">&mdash;</div>
         </div>
-        <div class="form-sub" id="d-form-sub">&mdash;</div>
+        <div class="chart-host" id="d-chart"></div>
+        <div class="chart-legend">
+          <span><i class="lg-swatch lg-pos"></i>Above breakeven</span>
+          <span><i class="lg-swatch lg-neg"></i>Below breakeven</span>
+        </div>
       </div>
-      <div class="chart-host" id="d-chart"></div>
-      <div class="chart-foot">
-        <span>$100 stake / call</span>
-        <span class="foot-note" id="d-alltime">&mdash;</span>
+
+      <div class="panel">
+        <div class="d-label">By league</div>
+        <div class="categories-list" id="d-categories">
+          <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-meter"></span><span class="cat-rate skeleton">&nbsp;</span></div>
+          <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-meter"></span><span class="cat-rate skeleton">&nbsp;</span></div>
+          <div class="cat-row"><span class="cat-label skeleton">&nbsp;</span><span class="cat-meter"></span><span class="cat-rate skeleton">&nbsp;</span></div>
+        </div>
+        <div class="cat-footer" id="d-cat-footer"></div>
       </div>
     </div>
   </div>
 
-  <div class="res-section">
-    <div class="d-label">Recent resolutions</div>
-    <div class="panel" style="padding:0;overflow:hidden">
-      <table class="res-table">
-        <thead>
-          <tr>
-            <th class="res-date">Date</th>
-            <th class="res-tag">Tag</th>
-            <th>Market</th>
-            <th class="res-side">Side</th>
-            <th class="res-status">Result</th>
-            <th class="res-return">Return</th>
-          </tr>
-        </thead>
-        <tbody id="d-res-body">
-          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
-          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
-          <tr><td class="res-date"><span class="skeleton">&nbsp;</span></td><td class="res-tag"><span class="skeleton">&nbsp;</span></td><td class="res-market"><span class="skeleton">&nbsp;</span></td><td class="res-side"><span class="skeleton">&nbsp;</span></td><td class="res-status">·</td><td class="res-return"><span class="skeleton">&nbsp;</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
 </section>
 <!-- ═══════════ /Dashboard section ═══════════ -->
 
@@ -1298,54 +1332,71 @@
 
     const catEl = $('d-categories');
     if (catEl && Array.isArray(data.categories) && data.categories.length) {
-      const insider = data.insider || { labels: [], calls: 0, winRate: null };
-      const insiderCount = Number(insider.calls || 0);
-      // Display rule for the rate column:
-      //   resolved >= 1  → show "X%" (uniform across all leagues)
-      //   resolved == 0  → show "—" (all pending)
-      const rateForCat = (cat) => {
-        const resolved = Number(cat.resolved || 0);
-        if (resolved > 0 && cat.winRate != null) return cat.winRate.toFixed(0) + '%';
-        return '—';
-      };
+      const insiderCat = data.insider || { labels: [], calls: 0, winRate: null };
+      const insiderCount = Number(insiderCat.calls || 0);
+
+      // Meter fill = win rate. Tick = breakeven (that league's avg entry
+      // price). Fill colour says whether the league cleared its own price,
+      // which is the only reading of a win rate that means anything.
       const rows = data.categories
         .filter(cat => (cat.calls || 0) > 0)
         .map(cat => {
-          const rateText = rateForCat(cat);
-          return '<div class="cat-row">' +
+          const resolved = Number(cat.resolved || 0);
+          const wr = (resolved > 0 && cat.winRate != null) ? cat.winRate : null;
+          const be = cat.breakevenWr;
+          const edge = cat.edge;
+
+          let fillCls = 'is-flat', rateCls = '';
+          if (wr != null && edge != null) {
+            if (edge > 0)      { fillCls = '';          rateCls = ' is-over';  }
+            else if (edge < 0) { fillCls = ' is-under';  rateCls = ' is-under'; }
+          }
+
+          const fillW = wr != null ? Math.max(0, Math.min(100, wr)) : 0;
+          const tick = (be != null)
+            ? '<i class="cat-tick" style="left:' + Math.max(0, Math.min(100, be)) + '%"></i>'
+            : '';
+          const rateText = wr != null ? wr.toFixed(0) + '%' : '\u2014';
+          const edgeText = edge != null
+            ? (edge > 0 ? '+' : '') + edge.toFixed(1)
+            : '';
+          const title = wr != null && be != null
+            ? cat.label + ': ' + wr.toFixed(1) + '% win rate vs ' + be.toFixed(1) +
+              '% breakeven \u00b7 ' + (edge > 0 ? '+' : '') + edge.toFixed(1) +
+              'pts \u00b7 ' + cat.calls + ' calls'
+            : cat.label + ': ' + cat.calls + ' calls, none resolved yet';
+
+          return '<div class="cat-row" title="' + esc(title) + '">' +
             '<span class="cat-label">' + esc(fmtTag(cat.label)) + '</span>' +
-            '<span class="cat-bar"></span>' +
-            '<span class="cat-count">' + cat.calls + ' ' + (cat.calls === 1 ? 'call' : 'calls') + '</span>' +
-            '<span class="cat-rate">' + rateText + '</span>' +
-            '<span class="cat-dot ' + dotClass(cat.winRate) + '">●</span>' +
+            '<span class="cat-meter">' +
+              '<i class="cat-fill' + fillCls + '" style="width:' + fillW + '%"></i>' +
+              tick +
+            '</span>' +
+            '<span class="cat-right">' +
+              '<span class="cat-rate' + rateCls + '">' + rateText + '</span>' +
+              '<span class="cat-count">' +
+                (edgeText || (cat.calls + (cat.calls === 1 ? ' call' : ' calls'))) +
+              '</span>' +
+            '</span>' +
           '</div>';
         }).join('');
-      const insiderResolved = Number(insider.resolved || 0);
-      const insiderRate = insiderResolved >= 10 && insider.winRate != null
-        ? Number(insider.winRate).toFixed(0) + '%'
-        : insiderResolved > 0
-          ? (insider.wins || 0) + '-' + (insider.losses || 0)
-          : '—';
-      const insiderLabel = insider.displayLabel
-        || (Array.isArray(insider.labels) && insider.labels.length
-            ? insider.labels.map(s => fmtTag(s)).join(' + ')
-            : 'Others');
-      const insiderTitle = 'Politics, Crypto, and other markets outside the listed sport leagues. Counts toward the headline total and accuracy.';
-      const tail = insiderCount > 0
-        ? '<div class="cat-row cat-row-insider" title="' + esc(insiderTitle) + '" style="opacity:0.85">' +
-            '<span class="cat-label">' + esc(insiderLabel) + '</span>' +
-            '<span class="cat-bar"></span>' +
-            '<span class="cat-count">' + insiderCount + ' ' + (insiderCount === 1 ? 'call' : 'calls') + '</span>' +
-            '<span class="cat-rate">' + insiderRate + '</span>' +
-            '<span class="cat-dot ' + dotClass(insider.winRate) + '">●</span>' +
-          '</div>'
-        : '';
-      catEl.innerHTML = rows + tail;
+
+      catEl.innerHTML = rows;
+
+      const footEl = $('d-cat-footer');
+      if (footEl) {
+        const bits = ['Bar = win rate \u00b7 tick = breakeven \u00b7 number = points vs breakeven'];
+        if (insiderCount > 0) {
+          bits.push('Others (' + insiderCat.labels.join(', ') + '): ' + insiderCount +
+            ' calls' + (insiderCat.winRate != null ? ' \u00b7 ' + insiderCat.winRate.toFixed(0) + '%' : ''));
+        }
+        footEl.textContent = bits.join('\n');
+      }
     }
 
     const callsEl = $('d-calls');
     if (callsEl && Array.isArray(data.recentCalls) && data.recentCalls.length) {
-      callsEl.innerHTML = data.recentCalls.slice(0, 3).map(call => {
+      callsEl.innerHTML = data.recentCalls.slice(0, 6).map(call => {
         const tag = esc(fmtTag(call.sport));
         const status = call.outcome === 'WIN' ? 'is-win'
           : call.outcome === 'LOSS' ? 'is-loss' : 'is-live';
@@ -1398,133 +1449,128 @@
     }
 
     // ── Monthly performance chart ────────────────────────────────────────
-    // Bars = P&L per calendar month. Lines = win rate vs breakeven win rate.
-    // Breakeven WR is the average entry price: a favorite bought at 62c has
-    // to hit 62% just to break even, so raw win rate alone is meaningless
-    // without it. Month bars (not an all-time cumulative line) keep current
-    // form readable instead of burying it under one heavy month.
+    // Plots EDGE -- win rate minus breakeven win rate, in points -- rather
+    // than raw P&L. Breakeven WR is the average entry price: a favorite
+    // bought at 62c must hit 62% just to break even. Edge is the honest
+    // single number (above zero = the month cleared its own prices) and it
+    // also scales readably: raw P&L put May at -$4,971 against September at
+    // +$140, which flattened every other month into invisibility.
     const months = Array.isArray(data.monthlySeries) ? data.monthlySeries : [];
     const form   = data.currentForm || null;
 
     const signMoney = (v) => (v >= 0 ? '+$' + Math.round(v) : '\u2212$' + Math.round(Math.abs(v)));
-
-    // Lead with the current month, with rolling 30-day as supporting context.
+    const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const MONTH_NAMES = ['January','February','March','April','May','June',
                          'July','August','September','October','November','December'];
-    const cur = months.length ? months[months.length - 1] : null;
-    const lead = (cur && cur.resolved > 0) ? cur : null;
+    const monthIdx = (ym) => parseInt(String(ym).split('-')[1], 10) - 1;
 
-    if (lead) {
+    // Lead with the current month; rolling 30-day as supporting context.
+    const cur = months.length ? months[months.length - 1] : null;
+    if (cur && cur.resolved > 0) {
       const periodEl = $('d-form-period');
       const wrEl     = $('d-form-wr');
       const pnlEl2   = $('d-form-pnl');
       const subEl    = $('d-form-sub');
 
-      if (periodEl) {
-        const parts = String(lead.month).split('-');
-        const mi = parseInt(parts[1], 10) - 1;
-        periodEl.textContent = (MONTH_NAMES[mi] || lead.month) + ' so far';
-      }
-      if (wrEl) wrEl.textContent = (lead.winRate != null ? lead.winRate.toFixed(1) : '\u2014') + '%';
+      if (periodEl) periodEl.textContent = (MONTH_NAMES[monthIdx(cur.month)] || cur.month) + ' so far';
+      if (wrEl) wrEl.textContent = (cur.winRate != null ? cur.winRate.toFixed(1) : '\u2014') + '%';
       if (pnlEl2) {
-        pnlEl2.textContent = signMoney(lead.pnl);
-        pnlEl2.classList.toggle('is-neg', lead.pnl < 0);
+        const up = cur.edge != null && cur.edge >= 0;
+        pnlEl2.textContent = (cur.edge != null
+          ? (up ? '+' : '') + cur.edge.toFixed(1) + 'pts vs breakeven'
+          : '\u2014');
+        pnlEl2.classList.toggle('is-neg', !up);
       }
       if (subEl) {
-        const be = lead.breakevenWr != null ? lead.breakevenWr.toFixed(1) + '%' : '\u2014';
-        const edge = lead.edge != null
-          ? (lead.edge >= 0 ? '+' + lead.edge.toFixed(1) : lead.edge.toFixed(1)) + 'pts vs breakeven'
-          : '';
-        let sub = lead.wins + 'W / ' + lead.losses + 'L across ' + lead.resolved +
-                  ' resolved \u00b7 breakeven ' + be + ' \u00b7 ' + edge;
+        const be = cur.breakevenWr != null ? cur.breakevenWr.toFixed(1) + '%' : '\u2014';
+        let sub = cur.wins + 'W / ' + cur.losses + 'L across ' + cur.resolved +
+                  ' resolved \u00b7 breakeven ' + be;
         if (form && form.resolved > 0 && form.winRate != null) {
-          sub += '\nRolling 30 days: ' + form.winRate.toFixed(1) + '% \u00b7 ' +
-                 signMoney(form.pnl) + ' across ' + form.resolved + ' resolved';
+          sub += '\nRolling 30 days: ' + form.winRate.toFixed(1) + '% vs ' +
+                 (form.breakevenWr != null ? form.breakevenWr.toFixed(1) + '%' : '\u2014') +
+                 ' breakeven \u00b7 ' + form.resolved + ' resolved';
         }
         subEl.textContent = sub;
       }
     }
 
-    // All-time footnote — kept visible so the record stays verifiable.
-    const allTimePnl = months.reduce((sum, m) => sum + (m.pnl || 0), 0);
-    const allTimeRes = months.reduce((sum, m) => sum + (m.resolved || 0), 0);
-    const allTimeW   = months.reduce((sum, m) => sum + (m.wins || 0), 0);
-    const atEl = $('d-alltime');
-    if (atEl && allTimeRes > 0) {
-      atEl.textContent = 'All time: ' + ((allTimeW / allTimeRes) * 100).toFixed(1) +
-        '% \u00b7 ' + signMoney(allTimePnl) + ' \u00b7 ' + allTimeRes + ' calls';
-    }
-
     if (typeof ApexCharts !== 'undefined' && months.length) {
-      const labels = months.map(m => m.month);
       const chartEl = $('d-chart');
       if (chartEl) {
         new ApexCharts(chartEl, {
           chart: {
-            type: 'line', height: 260, toolbar: { show: false }, zoom: { enabled: false },
-            background: 'transparent',
-            animations: { enabled: true, easing: 'easeinout', speed: 600 }
+            type: 'bar', height: 250, toolbar: { show: false }, zoom: { enabled: false },
+            background: 'transparent', fontFamily: 'JetBrains Mono, SF Mono, monospace',
+            animations: { enabled: true, easing: 'easeinout', speed: 650 }
           },
-          series: [
-            { name: 'P&L', type: 'column', data: months.map(m => Math.round(m.pnl)) },
-            { name: 'Win rate', type: 'line', data: months.map(m => m.winRate) },
-            { name: 'Breakeven', type: 'line', data: months.map(m => m.breakevenWr) }
-          ],
+          series: [{
+            name: 'Edge',
+            data: months.map(m => ({
+              x: MONTH_ABBR[monthIdx(m.month)] || m.month,
+              y: m.edge != null ? Number(m.edge.toFixed(1)) : 0,
+              meta: m
+            }))
+          }],
           plotOptions: {
             bar: {
-              columnWidth: '52%', borderRadius: 3,
+              columnWidth: '46%', borderRadius: 4, borderRadiusApplication: 'end',
+              dataLabels: { position: 'top' },
               colors: {
                 ranges: [
-                  { from: -1000000, to: -0.01, color: '#E0556B' },
-                  { from: 0,        to: 1000000, color: '#22D478' }
+                  { from: -100, to: -0.0001, color: '#E0556B' },
+                  { from: 0,    to: 100,     color: '#22D478' }
                 ]
               }
             }
           },
-          stroke: { width: [0, 2, 2], curve: 'smooth', dashArray: [0, 0, 5] },
-          colors: ['#22D478', '#F4F6FA', '#888'],
-          markers: { size: [0, 3, 0], strokeWidth: 0 },
-          labels: labels,
+          dataLabels: {
+            enabled: true,
+            formatter: (v) => (v > 0 ? '+' : '') + v,
+            offsetY: -18,
+            style: { fontSize: '10px', fontWeight: 700, colors: ['#9AA3AF'] }
+          },
           xaxis: {
-            labels: { style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' } },
-            axisBorder: { show: false }, axisTicks: { show: false }
+            labels: { style: { colors: '#888', fontSize: '10.5px' } },
+            axisBorder: { show: false }, axisTicks: { show: false },
+            crosshairs: { show: false }
           },
-          yaxis: [
-            {
-              seriesName: 'P&L',
-              labels: {
-                style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' },
-                formatter: (v) => signMoney(v)
-              }
-            },
-            {
-              seriesName: 'Win rate', opposite: true, min: 0, max: 100,
-              labels: {
-                style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' },
-                formatter: (v) => Math.round(v) + '%'
-              }
-            },
-            { seriesName: 'Win rate', opposite: true, min: 0, max: 100, show: false }
-          ],
-          grid: {
-            borderColor: 'rgba(255,255,255,0.06)', strokeDashArray: 4,
-            xaxis: { lines: { show: false } }
-          },
-          tooltip: {
-            theme: 'dark', shared: true, intersect: false,
-            y: {
-              formatter: (v, opts) => {
-                if (v == null) return '\u2014';
-                return opts.seriesIndex === 0 ? signMoney(v) : v.toFixed(1) + '%';
-              }
+          yaxis: {
+            labels: {
+              style: { colors: '#888', fontSize: '10px' },
+              formatter: (v) => (v > 0 ? '+' : '') + Math.round(v) + 'pts'
             }
           },
-          dataLabels: { enabled: false },
-          legend: {
-            show: true, position: 'top', horizontalAlign: 'right',
-            fontSize: '10px', fontFamily: 'JetBrains Mono, SF Mono, monospace',
-            labels: { colors: '#888' }, markers: { width: 8, height: 8 }
-          }
+          annotations: {
+            // Zero = breakeven. Left unlabelled on purpose: the y-axis reads
+            // "0pts" and the legend names both sides, so an inline label just
+            // collides with whichever bar happens to sit at the left edge.
+            yaxis: [{
+              y: 0, strokeDashArray: 0, borderColor: 'rgba(255,255,255,0.28)'
+            }]
+          },
+          grid: {
+            borderColor: 'rgba(255,255,255,0.05)', strokeDashArray: 4,
+            xaxis: { lines: { show: false } }, padding: { top: 8, left: 4, right: 4 }
+          },
+          tooltip: {
+            theme: 'dark',
+            custom: ({ dataPointIndex }) => {
+              const m = months[dataPointIndex];
+              if (!m) return '';
+              const up = (m.edge || 0) >= 0;
+              return '<div style="padding:9px 12px;font-family:JetBrains Mono,SF Mono,monospace;font-size:11px;line-height:1.7">' +
+                '<div style="font-weight:700;margin-bottom:5px;letter-spacing:.5px">' +
+                  (MONTH_NAMES[monthIdx(m.month)] || m.month) + '</div>' +
+                '<div>Win rate <b>' + (m.winRate != null ? m.winRate.toFixed(1) : '\u2014') + '%</b></div>' +
+                '<div>Breakeven <b>' + (m.breakevenWr != null ? m.breakevenWr.toFixed(1) : '\u2014') + '%</b></div>' +
+                '<div style="color:' + (up ? '#22D478' : '#E0556B') + '">Edge <b>' +
+                  (m.edge != null ? (up ? '+' : '') + m.edge.toFixed(1) : '\u2014') + 'pts</b></div>' +
+                '<div style="color:#8A9099;margin-top:4px">' + m.wins + 'W / ' + m.losses +
+                  'L \u00b7 ' + m.resolved + ' calls</div>' +
+              '</div>';
+            }
+          },
+          legend: { show: false }
         }).render();
       }
     }
