@@ -756,6 +756,32 @@
     color:var(--d-win);font-weight:700;font-variant-numeric:tabular-nums;
   }
   #dashboard .chart-foot .pnl.is-neg{color:var(--d-loss)}
+  #dashboard .chart-foot .foot-note{
+    font-size:10px;letter-spacing:1.2px;color:var(--d-muted);
+    text-transform:none;font-weight:600;
+  }
+  #dashboard .form-lead{margin:2px 0 14px}
+  #dashboard .form-headline{
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  }
+  #dashboard .form-period{
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--d-muted);font-weight:600;
+  }
+  #dashboard .form-wr{
+    font-size:30px;font-weight:700;line-height:1;
+    font-variant-numeric:tabular-nums;color:var(--d-text,#fff);
+  }
+  #dashboard .form-pnl{
+    font-size:18px;font-weight:700;line-height:1;
+    font-variant-numeric:tabular-nums;color:var(--d-win);
+  }
+  #dashboard .form-pnl.is-neg{color:var(--d-loss)}
+  #dashboard .form-sub{
+    margin-top:6px;font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:11px;color:var(--d-muted);letter-spacing:.3px;line-height:1.6;white-space:pre-line;
+  }
 
   #dashboard .res-section{max-width:1280px;margin:56px auto 0}
   #dashboard .res-table{
@@ -908,11 +934,19 @@
     </div>
 
     <div class="panel chart-panel">
-      <div class="d-label">Cumulative performance</div>
+      <div class="d-label">Monthly performance</div>
+      <div class="form-lead" id="d-form-lead">
+        <div class="form-headline">
+          <span class="form-period" id="d-form-period">Last 30 days</span>
+          <span class="form-wr" id="d-form-wr">&mdash;</span>
+          <span class="form-pnl" id="d-form-pnl">&mdash;</span>
+        </div>
+        <div class="form-sub" id="d-form-sub">&mdash;</div>
+      </div>
       <div class="chart-host" id="d-chart"></div>
       <div class="chart-foot">
         <span>$100 stake / call</span>
-        <span class="pnl" id="d-pnl">—</span>
+        <span class="foot-note" id="d-alltime">&mdash;</span>
       </div>
     </div>
   </div>
@@ -1363,61 +1397,134 @@
       }).join('');
     }
 
-    if (typeof ApexCharts !== 'undefined' && pnl.length) {
-      const series = pnl.map(p => ({ x: p.ts, y: Math.round(p.cumulativeReturn) }));
-      const finalPnl = pnl[pnl.length - 1].cumulativeReturn;
-      const isPos = finalPnl >= 0;
-      const pnlEl = $('d-pnl');
-      if (pnlEl) {
-        pnlEl.textContent = fmtMoney(finalPnl);
-        pnlEl.classList.toggle('is-neg', !isPos);
+    // ── Monthly performance chart ────────────────────────────────────────
+    // Bars = P&L per calendar month. Lines = win rate vs breakeven win rate.
+    // Breakeven WR is the average entry price: a favorite bought at 62c has
+    // to hit 62% just to break even, so raw win rate alone is meaningless
+    // without it. Month bars (not an all-time cumulative line) keep current
+    // form readable instead of burying it under one heavy month.
+    const months = Array.isArray(data.monthlySeries) ? data.monthlySeries : [];
+    const form   = data.currentForm || null;
+
+    const signMoney = (v) => (v >= 0 ? '+$' + Math.round(v) : '\u2212$' + Math.round(Math.abs(v)));
+
+    // Lead with the current month, with rolling 30-day as supporting context.
+    const MONTH_NAMES = ['January','February','March','April','May','June',
+                         'July','August','September','October','November','December'];
+    const cur = months.length ? months[months.length - 1] : null;
+    const lead = (cur && cur.resolved > 0) ? cur : null;
+
+    if (lead) {
+      const periodEl = $('d-form-period');
+      const wrEl     = $('d-form-wr');
+      const pnlEl2   = $('d-form-pnl');
+      const subEl    = $('d-form-sub');
+
+      if (periodEl) {
+        const parts = String(lead.month).split('-');
+        const mi = parseInt(parts[1], 10) - 1;
+        periodEl.textContent = (MONTH_NAMES[mi] || lead.month) + ' so far';
       }
+      if (wrEl) wrEl.textContent = (lead.winRate != null ? lead.winRate.toFixed(1) : '\u2014') + '%';
+      if (pnlEl2) {
+        pnlEl2.textContent = signMoney(lead.pnl);
+        pnlEl2.classList.toggle('is-neg', lead.pnl < 0);
+      }
+      if (subEl) {
+        const be = lead.breakevenWr != null ? lead.breakevenWr.toFixed(1) + '%' : '\u2014';
+        const edge = lead.edge != null
+          ? (lead.edge >= 0 ? '+' + lead.edge.toFixed(1) : lead.edge.toFixed(1)) + 'pts vs breakeven'
+          : '';
+        let sub = lead.wins + 'W / ' + lead.losses + 'L across ' + lead.resolved +
+                  ' resolved \u00b7 breakeven ' + be + ' \u00b7 ' + edge;
+        if (form && form.resolved > 0 && form.winRate != null) {
+          sub += '\nRolling 30 days: ' + form.winRate.toFixed(1) + '% \u00b7 ' +
+                 signMoney(form.pnl) + ' across ' + form.resolved + ' resolved';
+        }
+        subEl.textContent = sub;
+      }
+    }
+
+    // All-time footnote — kept visible so the record stays verifiable.
+    const allTimePnl = months.reduce((sum, m) => sum + (m.pnl || 0), 0);
+    const allTimeRes = months.reduce((sum, m) => sum + (m.resolved || 0), 0);
+    const allTimeW   = months.reduce((sum, m) => sum + (m.wins || 0), 0);
+    const atEl = $('d-alltime');
+    if (atEl && allTimeRes > 0) {
+      atEl.textContent = 'All time: ' + ((allTimeW / allTimeRes) * 100).toFixed(1) +
+        '% \u00b7 ' + signMoney(allTimePnl) + ' \u00b7 ' + allTimeRes + ' calls';
+    }
+
+    if (typeof ApexCharts !== 'undefined' && months.length) {
+      const labels = months.map(m => m.month);
       const chartEl = $('d-chart');
       if (chartEl) {
         new ApexCharts(chartEl, {
           chart: {
-            type: 'area', height: 240, toolbar: { show: false }, zoom: { enabled: false },
+            type: 'line', height: 260, toolbar: { show: false }, zoom: { enabled: false },
             background: 'transparent',
             animations: { enabled: true, easing: 'easeinout', speed: 600 }
           },
-          series: [{ name: 'Cumulative', data: series }],
+          series: [
+            { name: 'P&L', type: 'column', data: months.map(m => Math.round(m.pnl)) },
+            { name: 'Win rate', type: 'line', data: months.map(m => m.winRate) },
+            { name: 'Breakeven', type: 'line', data: months.map(m => m.breakevenWr) }
+          ],
+          plotOptions: {
+            bar: {
+              columnWidth: '52%', borderRadius: 3,
+              colors: {
+                ranges: [
+                  { from: -1000000, to: -0.01, color: '#E0556B' },
+                  { from: 0,        to: 1000000, color: '#22D478' }
+                ]
+              }
+            }
+          },
+          stroke: { width: [0, 2, 2], curve: 'smooth', dashArray: [0, 0, 5] },
+          colors: ['#22D478', '#F4F6FA', '#888'],
+          markers: { size: [0, 3, 0], strokeWidth: 0 },
+          labels: labels,
           xaxis: {
-            type: 'datetime',
-            labels: {
-              style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' }
+            labels: { style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' } },
+            axisBorder: { show: false }, axisTicks: { show: false }
+          },
+          yaxis: [
+            {
+              seriesName: 'P&L',
+              labels: {
+                style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' },
+                formatter: (v) => signMoney(v)
+              }
             },
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-          },
-          yaxis: {
-            labels: {
-              style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' },
-              formatter: (v) => v >= 0 ? '+$' + Math.round(v) : '−$' + Math.round(Math.abs(v))
-            }
-          },
-          stroke: { curve: 'smooth', width: 2, colors: ['#EC4899'] },
-          fill: {
-            type: 'gradient',
-            gradient: {
-              shadeIntensity: 1,
-              opacityFrom: 0.45,
-              opacityTo: 0,
-              stops: [0, 100]
-            }
-          },
-          colors: ['#EC4899'],
+            {
+              seriesName: 'Win rate', opposite: true, min: 0, max: 100,
+              labels: {
+                style: { colors: '#888', fontFamily: 'JetBrains Mono, SF Mono, monospace', fontSize: '10px' },
+                formatter: (v) => Math.round(v) + '%'
+              }
+            },
+            { seriesName: 'Win rate', opposite: true, min: 0, max: 100, show: false }
+          ],
           grid: {
-            borderColor: 'rgba(255,255,255,0.06)',
-            strokeDashArray: 4,
+            borderColor: 'rgba(255,255,255,0.06)', strokeDashArray: 4,
             xaxis: { lines: { show: false } }
           },
           tooltip: {
-            theme: 'dark',
-            x: { format: 'dd MMM yyyy' },
-            y: { formatter: (v) => v >= 0 ? '+$' + v : '−$' + Math.abs(v) }
+            theme: 'dark', shared: true, intersect: false,
+            y: {
+              formatter: (v, opts) => {
+                if (v == null) return '\u2014';
+                return opts.seriesIndex === 0 ? signMoney(v) : v.toFixed(1) + '%';
+              }
+            }
           },
           dataLabels: { enabled: false },
-          legend: { show: false }
+          legend: {
+            show: true, position: 'top', horizontalAlign: 'right',
+            fontSize: '10px', fontFamily: 'JetBrains Mono, SF Mono, monospace',
+            labels: { colors: '#888' }, markers: { width: 8, height: 8 }
+          }
         }).render();
       }
     }

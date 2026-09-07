@@ -19,7 +19,7 @@ const HIDE_LABELS = INSIDER_CATEGORIES;
 
 export default async function handler() {
   try {
-    const [counterRows, recentRows, pnlRows, insiderRows, leagueRows] = await Promise.all([
+    const [counterRows, recentRows, pnlRows, insiderRows, leagueRows, monthlyRows, formRows, rowTotalRows] = await Promise.all([
       // Counter — global totals across ALL categories (politics included)
       sql`
         SELECT next_id, wins, losses, pending,
@@ -86,9 +86,69 @@ export default async function handler() {
         GROUP BY COALESCE(sport, 'OtherSports')
         ORDER BY calls DESC
       `,
+      // Monthly P&L — the hero chart's series. One row per calendar month
+      // with win rate, breakeven WR (= avg entry price, since a favorite
+      // priced at 0.62 must hit 62% just to break even) and flat-$100 P&L.
+      // Month bars replace the all-time cumulative line so a single bad
+      // month can't bury current form.
+      sql`
+        SELECT
+          to_char(timestamp, 'YYYY-MM') AS month,
+          MIN(timestamp) AS month_start,
+          COUNT(*)::int AS resolved,
+          SUM(CASE WHEN outcome = 'WIN' THEN 1 ELSE 0 END)::int AS wins,
+          SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
+          (AVG(entry_price) * 100)::float8 AS breakeven_wr,
+          SUM(CASE
+                WHEN outcome = 'WIN' AND entry_price > 0 THEN (1.0 / entry_price - 1) * 100
+                ELSE -100
+              END)::float8 AS pnl
+        FROM calls
+        WHERE outcome IN ('WIN', 'LOSS')
+        GROUP BY 1
+        ORDER BY 1 ASC
+      `,
+      // Rolling 30-day form — what the hero headline leads with.
+      sql`
+        SELECT
+          COUNT(*)::int AS resolved,
+          SUM(CASE WHEN outcome = 'WIN' THEN 1 ELSE 0 END)::int AS wins,
+          SUM(CASE WHEN outcome = 'LOSS' THEN 1 ELSE 0 END)::int AS losses,
+          (AVG(entry_price) * 100)::float8 AS breakeven_wr,
+          SUM(CASE
+                WHEN outcome = 'WIN' AND entry_price > 0 THEN (1.0 / entry_price - 1) * 100
+                ELSE -100
+              END)::float8 AS pnl
+        FROM calls
+        WHERE outcome IN ('WIN', 'LOSS')
+          AND timestamp > now() - interval '30 days'
+      `,
+      // Rows-derived totals — the single source of truth for the headline.
+      // call_counter carries ~248 pre-Neon-migration increments that have no
+      // per-call row, so counter-derived accuracy (57.1%) and row-derived
+      // accuracy (55.3%) disagreed. Everything public now reads from rows.
+      sql`
+        SELECT
+          COUNT(*) FILTER (WHERE outcome IN ('WIN','LOSS'))::int AS resolved,
+          COUNT(*) FILTER (WHERE outcome = 'WIN')::int  AS wins,
+          COUNT(*) FILTER (WHERE outcome = 'LOSS')::int AS losses,
+          COUNT(*) FILTER (WHERE outcome IS NULL OR outcome NOT IN ('WIN','LOSS'))::int AS pending,
+          COUNT(*)::int AS total
+        FROM calls
+      `,
     ]);
 
     const counter = counterRows[0];
+    // Rows-derived headline — single source of truth. See the rowTotal query
+    // above for why this replaces counter-derived accuracy.
+    const rowTotal = (rowTotalRows && rowTotalRows[0]) || null;
+    const headline = rowTotal ? {
+      wins:     Number(rowTotal.wins     || 0),
+      losses:   Number(rowTotal.losses   || 0),
+      pending:  Number(rowTotal.pending  || 0),
+      resolved: Number(rowTotal.resolved || 0),
+      total:    Number(rowTotal.total    || 0),
+    } : null;
     if (!counter) {
       return new Response(
         JSON.stringify({ error: 'no counter row' }),
@@ -128,10 +188,16 @@ export default async function handler() {
     const sumLeagueCalls   = categories.reduce((s, c) => s + (c.calls   || 0), 0);
     const sumLeagueWins    = categories.reduce((s, c) => s + (c.wins    || 0), 0);
     const sumLeagueLosses  = categories.reduce((s, c) => s + (c.losses  || 0), 0);
-    const headlineTotalCalls = (counter.wins || 0) + (counter.losses || 0) + (counter.pending || 0);
-    const othersCalls   = Math.max(0, headlineTotalCalls       - sumLeagueCalls);
-    const othersWins    = Math.max(0, (counter.wins   || 0) - sumLeagueWins);
-    const othersLosses  = Math.max(0, (counter.losses || 0) - sumLeagueLosses);
+    // Residual is measured against the ROWS headline now, so "Others" holds
+    // only Politics/Crypto — the phantom pre-migration calls it used to
+    // absorb are simply not in the row-derived totals at all.
+    const baseWins    = headline ? headline.wins    : (counter.wins    || 0);
+    const baseLosses  = headline ? headline.losses  : (counter.losses  || 0);
+    const basePending = headline ? headline.pending : (counter.pending || 0);
+    const headlineTotalCalls = baseWins + baseLosses + basePending;
+    const othersCalls   = Math.max(0, headlineTotalCalls - sumLeagueCalls);
+    const othersWins    = Math.max(0, baseWins   - sumLeagueWins);
+    const othersLosses  = Math.max(0, baseLosses - sumLeagueLosses);
     const othersResolved = othersWins + othersLosses;
     const insider = {
       labels: INSIDER_CATEGORIES,
@@ -183,15 +249,59 @@ export default async function handler() {
       };
     });
 
+    const pct = (w, r) => (r > 0 ? Math.round((w / r) * 1000) / 10 : null);
+    const round2 = (v) => Math.round(Number(v || 0) * 100) / 100;
+
+    // Monthly bars — each month standalone, so recovery is visible.
+    const monthlySeries = (monthlyRows || []).map(r => {
+      const resolved = Number(r.resolved || 0);
+      const wins = Number(r.wins || 0);
+      const wr = pct(wins, resolved);
+      const be = r.breakeven_wr != null ? Math.round(Number(r.breakeven_wr) * 10) / 10 : null;
+      return {
+        month: r.month,
+        ts: new Date(r.month_start).getTime(),
+        resolved,
+        wins,
+        losses: Number(r.losses || 0),
+        winRate: wr,
+        breakevenWr: be,
+        // Positive edge = win rate cleared the price you paid.
+        edge: (wr != null && be != null) ? Math.round((wr - be) * 10) / 10 : null,
+        pnl: round2(r.pnl),
+      };
+    });
+
+    // Rolling 30-day form — the number the page leads with.
+    const f = (formRows && formRows[0]) || null;
+    const formResolved = f ? Number(f.resolved || 0) : 0;
+    const formWins = f ? Number(f.wins || 0) : 0;
+    const formWr = pct(formWins, formResolved);
+    const formBe = f && f.breakeven_wr != null
+      ? Math.round(Number(f.breakeven_wr) * 10) / 10 : null;
+    const currentForm = {
+      windowDays: 30,
+      resolved: formResolved,
+      wins: formWins,
+      losses: f ? Number(f.losses || 0) : 0,
+      winRate: formWr,
+      breakevenWr: formBe,
+      edge: (formWr != null && formBe != null)
+        ? Math.round((formWr - formBe) * 10) / 10 : null,
+      pnl: f ? round2(f.pnl) : 0,
+    };
+
     const body = {
       counter: {
-        wins: counter.wins,
-        losses: counter.losses,
-        pending: counter.pending,
+        wins: baseWins,
+        losses: baseLosses,
+        pending: basePending,
         nextId: counter.next_id,
-        total: counter.wins + counter.losses,
-        accuracy: counter.accuracy != null ? counter.accuracy.toFixed(1) : '0.0',
+        total: baseWins + baseLosses,
+        accuracy: (pct(baseWins, baseWins + baseLosses) ?? 0).toFixed(1),
       },
+      monthlySeries,
+      currentForm,
       categories,
       insider,
       categoriesHiddenCount,
