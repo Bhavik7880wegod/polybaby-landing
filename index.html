@@ -671,7 +671,7 @@
      whose tick marks the breakeven rate for that league's average entry
      price. Bar past the tick = the league cleared its own price. */
   #dashboard .cat-row{
-    display:grid;grid-template-columns:86px 1fr 80px;
+    display:grid;grid-template-columns:86px 1fr 112px;
     align-items:center;gap:14px;padding:11px 8px;border-radius:9px;
     font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
     font-size:12px;font-variant-numeric:tabular-nums;
@@ -704,6 +704,7 @@
   #dashboard .cat-rate.is-under{color:var(--d-loss)}
   #dashboard .cat-rate.is-over{color:var(--d-win)}
   #dashboard .cat-count{color:var(--d-muted);font-size:10.5px}
+  #dashboard .cat-n{color:var(--d-muted);font-size:10px;opacity:.7;min-width:22px;text-align:right}
   #dashboard .chart-legend{
     display:flex;gap:18px;margin-top:14px;padding-top:12px;
     border-top:1px solid var(--d-border);
@@ -850,9 +851,13 @@
   }
   #dashboard .form-pnl.is-neg{color:var(--d-loss)}
   #dashboard .form-sub{
-    margin-top:6px;font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
-    font-size:11px;color:var(--d-muted);letter-spacing:.3px;line-height:1.6;white-space:pre-line;
+    margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 22px;
+    font-family:'JetBrains Mono','SF Mono','Menlo',monospace;
+    font-size:11px;color:var(--d-muted);letter-spacing:.3px;line-height:1.4;
   }
+  #dashboard .fs-cell{display:flex;flex-direction:column;gap:2px}
+  #dashboard .fs-k{font-size:9px;letter-spacing:1.4px;text-transform:uppercase;opacity:.75}
+  #dashboard .fs-v{color:var(--d-text);font-weight:600;font-variant-numeric:tabular-nums}
 
   #dashboard .res-section{max-width:1280px;margin:32px auto 0}
   #dashboard .res-table{
@@ -872,13 +877,12 @@
   #dashboard .res-table .res-tag{color:var(--d-muted-strong);width:95px;letter-spacing:1px;text-transform:uppercase;font-weight:700;font-size:11px}
   #dashboard .res-table .res-market{max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #dashboard .res-table .res-side{color:var(--d-muted-strong);width:130px}
-  #dashboard .res-table .res-status{width:60px;text-align:center;font-size:14px}
+  #dashboard .res-table .res-status{width:60px;text-align:center}
+  #dashboard .res-table tbody td.res-status{font-size:14px}
+  #dashboard .res-table thead th.res-tag{font-size:10px;letter-spacing:inherit;font-weight:inherit;color:inherit}
   #dashboard .res-table .res-return{width:80px;text-align:right;color:var(--d-muted)}
   #dashboard .res-table .res-return.is-win{color:var(--d-win)}
-  @media (max-width:720px){
-    #dashboard .res-table .res-date,
-    #dashboard .res-table .res-side{display:none}
-  }
+
 
   @keyframes shimmer{0%{opacity:0.45}50%{opacity:0.65}100%{opacity:0.45}}
   #dashboard .skeleton{
@@ -895,6 +899,74 @@
     #dashboard .res-section{margin-top:20px}
     #dashboard .res-table thead th{font-size:9px;padding:10px 8px}
     #dashboard .res-table tbody td{padding:12px 8px;font-size:11px}
+  }
+
+
+  /* ── Tablet + phone: resolutions as cards (≤768px) ── */
+  @media (max-width:768px){
+    #dashboard .res-section{margin-top:28px}
+    #dashboard .res-table thead{display:none}
+    #dashboard .res-table,#dashboard .res-table tbody{display:block;width:100%}
+    #dashboard .res-table tbody tr{
+      display:grid;grid-template-columns:1fr auto auto;
+      grid-template-areas:"tag status return" "market market market" "side side side";
+      column-gap:10px;row-gap:5px;padding:13px 16px;border-bottom:1px solid var(--d-border);
+    }
+    #dashboard .res-table tbody tr:last-child{border-bottom:0}
+    #dashboard .res-table tbody td{display:block;padding:0;border:0;width:auto;max-width:none;white-space:normal;font-size:12px}
+    #dashboard .res-table .res-date{display:none}
+    #dashboard .res-table .res-tag{grid-area:tag;font-size:9.5px;letter-spacing:1.2px;align-self:center}
+    #dashboard .res-table .res-market{grid-area:market;font-size:13.5px;line-height:1.4;color:var(--d-text);overflow:visible;text-overflow:clip;white-space:normal;max-width:none}
+    #dashboard .res-table .res-side{grid-area:side;font-size:11px;color:var(--d-muted)}
+    #dashboard .res-table .res-status{grid-area:status;text-align:right;font-size:13px;align-self:center}
+    #dashboard .res-table .res-return{grid-area:return;text-align:right;min-width:44px;font-weight:700;align-self:center}
+  }
+
+  /* ── Phone layout (≤640px) ──────────────────────────────────────────── */
+  @media (max-width:640px){
+    #dashboard{padding:40px 16px 72px}
+    #dashboard .d-stats-wrap{margin-bottom:32px}
+    #dashboard .d-hero-stats{
+      display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;
+      padding:0;border-radius:18px;overflow:hidden;font-size:12px;
+    }
+    #dashboard .d-hero-stats > span:not(.sep){
+      display:flex;flex-direction:column;align-items:center;gap:5px;
+      padding:14px 8px;border-bottom:1px solid var(--d-border);
+    }
+    #dashboard .d-hero-stats > span:nth-of-type(odd){border-right:1px solid var(--d-border)}
+    #dashboard .d-hero-stats > span:last-child{grid-column:1 / -1;border-right:0;border-bottom:0}
+    #dashboard .d-hero-stats > span:nth-last-child(2){border-bottom:1px solid var(--d-border)}
+    #dashboard .d-hero-stats .stat-label{margin-right:0;font-size:9px;letter-spacing:1.6px}
+    #dashboard .d-hero-stats .stat-value{font-size:19px;line-height:1}
+    #dashboard .d-hero-stats .last5{font-size:16px;gap:7px}
+
+    #dashboard .d-grid{gap:24px}
+    #dashboard .panel{padding:20px 16px}
+    #dashboard .d-label{margin-bottom:12px}
+
+    #dashboard .form-headline{gap:8px 10px}
+    #dashboard .form-wr{font-size:38px}
+    #dashboard .form-headline .form-pnl{font-size:14px}
+    #dashboard .form-sub{gap:8px 18px;margin-top:12px}
+    #dashboard .fs-cell{flex:1 1 40%}
+
+    #dashboard .chart-legend{flex-wrap:wrap;gap:8px 16px;font-size:9px}
+    #dashboard .chart-legend .lg-note{flex-basis:100%;opacity:.8}
+
+    #dashboard .chart-cta{flex-direction:column;align-items:stretch;gap:12px;padding:16px;text-align:center}
+    #dashboard .chart-cta .cta{width:100%;justify-content:center;box-sizing:border-box}
+    #d-cta-head{font-size:15px;line-height:1.35}
+
+    #dashboard .cat-row{
+      grid-template-columns:1fr auto;grid-template-areas:"label right" "meter meter";
+      gap:8px 12px;padding:11px 4px;
+    }
+    #dashboard .cat-label{grid-area:label;font-size:12px}
+    #dashboard .cat-meter{grid-area:meter;height:7px}
+    #dashboard .cat-right{grid-area:right}
+    #dashboard .cat-rate{font-size:14px}
+
   }
 
 </style>
@@ -1366,6 +1438,7 @@
       $('d-last5').textContent = '—';
     }
 
+    const MIN_LEAGUE_RESOLVED = 10;
     const catEl = $('d-categories');
     if (catEl && Array.isArray(data.categories) && data.categories.length) {
       const insiderCat = data.insider || { labels: [], calls: 0, winRate: null };
@@ -1379,7 +1452,10 @@
       // are dropped entirely -- an empty meter reads as a zero, not as
       // "no data", which is worse than showing nothing.
       const rows = data.categories
-        .filter(cat => Number(cat.resolved || 0) > 0 && cat.edge != null)
+        // A league needs a real sample before it gets a bar. F1 at 100% on one
+        // resolved call sat at the top of the board and read as fabricated,
+        // which is the opposite of what a track-record panel is for.
+        .filter(cat => Number(cat.resolved || 0) >= MIN_LEAGUE_RESOLVED && cat.edge != null)
         .slice()
         .sort((a, b) => (b.edge - a.edge) || (b.resolved - a.resolved))
         .map(cat => {
@@ -1416,9 +1492,8 @@
             '</span>' +
             '<span class="cat-right">' +
               '<span class="cat-rate' + rateCls + '">' + rateText + '</span>' +
-              '<span class="cat-count">' +
-                (edgeText || (cat.calls + (cat.calls === 1 ? ' call' : ' calls'))) +
-              '</span>' +
+              '<span class="cat-count">' + edgeText + '</span>' +
+              '<span class="cat-n">' + resolved + '</span>' +
             '</span>' +
           '</div>';
         }).join('');
@@ -1427,7 +1502,7 @@
 
       const footEl = $('d-cat-footer');
       if (footEl) {
-        const bits = ['Bar = win rate \u00b7 tick = breakeven \u00b7 number = points vs breakeven'];
+        const bits = ['Bar = win rate \u00b7 tick = breakeven \u00b7 green number = points vs breakeven \u00b7 grey = resolved calls', 'Leagues with ' + MIN_LEAGUE_RESOLVED + '+ resolved calls'];
         if (insiderCount > 0) {
           bits.push('Others (' + insiderCat.labels.join(', ') + '): ' + insiderCount +
             ' calls' + (insiderCat.winRate != null ? ' \u00b7 ' + insiderCat.winRate.toFixed(0) + '%' : ''));
@@ -1496,14 +1571,17 @@
       }
       if (subEl) {
         const be = cur.breakevenWr != null ? cur.breakevenWr.toFixed(1) + '%' : '\u2014';
-        let sub = cur.wins + 'W / ' + cur.losses + 'L across ' + cur.resolved +
-                  ' resolved \u00b7 breakeven ' + be;
+        // Four short cells instead of two long sentences: on a phone the
+        // sentences wrapped with orphaned "58.2%" and "213 resolved" lines.
+        const cell = (k, v) => '<span class="fs-cell"><span class="fs-k">' + k + '</span><span class="fs-v">' + v + '</span></span>';
+        let sub = cell('Record', cur.wins + 'W \u2013 ' + cur.losses + 'L') +
+                  cell('Breakeven', be);
         if (form && form.resolved > 0 && form.winRate != null) {
-          sub += '\nRolling 30 days: ' + form.winRate.toFixed(1) + '% vs ' +
-                 (form.breakevenWr != null ? form.breakevenWr.toFixed(1) + '%' : '\u2014') +
-                 ' breakeven \u00b7 ' + form.resolved + ' resolved';
+          sub += cell('Last 30 days', form.winRate.toFixed(1) + '%') +
+                 cell('vs breakeven', (form.breakevenWr != null ? form.breakevenWr.toFixed(1) + '%' : '\u2014') +
+                      ' \u00b7 ' + form.resolved + ' calls');
         }
-        subEl.textContent = sub;
+        subEl.innerHTML = sub;
       }
     }
 
@@ -1583,7 +1661,17 @@
               '</div>';
             }
           },
-          legend: { show: false }
+          legend: { show: false },
+          responsive: [{
+            breakpoint: 640,
+            options: {
+              chart: { height: 250 },
+              plotOptions: { bar: { columnWidth: '52%' } },
+              dataLabels: { style: { fontSize: '10px' } },
+              yaxis: { labels: { style: { fontSize: '9px' } } },
+              xaxis: { labels: { style: { fontSize: '10px' } } }
+            }
+          }]
         }).render();
       }
     }
